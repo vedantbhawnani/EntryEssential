@@ -1,0 +1,25 @@
+Objective: A fast and efficient system to log cars from both gates.
+
+Requirements:
+- Centralized database.
+- Usable in any weather condiition - main drawback of OCR which needs optimal light.
+- Snappy
+- Clean interface - makes it easy to use and teach to new sewadars.
+- Display all hits on search.
+- Generate reports and export it in an excel format.
+  Secondary:
+  - Secured login to avoid logins from unauthorized people. A solution that safeguards against against unauthorized people logging in even if they get the credentials through some source.
+  - We could include an option to store the photo of the car in our database. This allows to add OCR later on if needed, and helps in the current scenario to avoid human error. (still will have the drawback of climate conditions and picture quality.)
+
+Queries:
+- Database: Deciding to stick with the SQL Database or using a NoSQL database. 
+SQL Databases are a little difficult to scale horizontally, and while NoSQL does provide the scalability and performance, we lose the the consistency provided by SQL.
+- UI refactoring to be done or do we continue with the same UI. 
+
+According to my understanding, the current issues include limit of vehicles shown on search.
+-----------------------------------------------------------------------------------------------------
+27/01
+- Container to display search results.
+Use a listview.builder to create a list of all the searches that show up, constrain this inside a container, and on click option to check in and check out.
+
+- Remove the time in time out button. Show searches as a list and allow clicking/swipe to mark check in. Check out automatically at 12pm/1pm.
