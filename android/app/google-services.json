@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "627815487648",
+    "project_id": "rssb-traffic-442db",
+    "storage_bucket": "rssb-traffic-442db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:627815487648:android:c96d3e695b9d27111e51c5",
+        "android_client_info": {
+          "package_name": "com.rssb.rssb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6HnMkCVlquBkvMX82UM6bTYdyE3BQkbw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

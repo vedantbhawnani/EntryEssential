@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:rssb/LoginPage.dart';
 import 'package:rssb/credentials.dart';
 
-import 'HomePage.dart';
-
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 

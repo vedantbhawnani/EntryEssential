@@ -1,0 +1,26 @@
+      floatingActionButton: FloatingActionButton(onPressed: () async {  final firestore = FirebaseFirestore.instance;
+  final collection = firestore.collection('users');
+
+  try {
+    // Replace with the actual path to your JSON file on the device
+    final filePath = 'path/to/your/data.json';
+    final jsonString = await File(filePath).readAsString();
+    final List<dynamic> jsonData = jsonDecode(jsonString);
+
+    final modifiedData = jsonData.map((map) {
+      final vehicleNumber = map['VehicleNumber']?.toString();
+      if (vehicleNumber != null && vehicleNumber.length >= 4) {
+        final fourNumber = vehicleNumber.substring(vehicleNumber.length - 4);
+        map['fourNumber'] = fourNumber;
+      }
+      return map;
+    }).toList().cast<Map<String, dynamic>>();
+
+    for (final map in modifiedData) {
+      await collection.add(map);
+    }
+
+    print('Data uploaded successfully!');
+  } catch (error) {
+    print('Error uploading data: $error');
+  }}, child: Icon(Icons.add))
