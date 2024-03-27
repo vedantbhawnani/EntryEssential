@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'HomePage.dart';
 import 'SignUp.dart';
+import 'credentials.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,17 +30,12 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.width / 2)),
-                  // Text("Login"),
-                  // *TODO Insert a Login Photo here
-                  Padding(
                     padding: EdgeInsets.only(
                         left: 50, right: 50, bottom: 20, top: 10),
                     child: TextField(
                       controller: nameController,
                       decoration: InputDecoration(
-                          labelText: 'Email Id',
+                          labelText: 'User Name',
                           border: OutlineInputBorder(),
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.blue)),
@@ -63,7 +59,19 @@ class _LoginPageState extends State<LoginPage> {
                       )),
                   ElevatedButton(
                       onPressed: () async {
-                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => HomePage()));
+                        var username = nameController.text;
+                        var password = passwordController.text;
+                        if (credentials.containsKey(username) &&
+                            credentials[username] == password) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()));
+                        } else {
+                          // Text('Incorrect User Name/Password');
+                          nameController.text = "";
+                          passwordController.text = "";
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                           elevation: 10,
@@ -71,7 +79,6 @@ class _LoginPageState extends State<LoginPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       child: Text("Login!")),
-
                   SizedBox(
                     height: 200,
                   ),
