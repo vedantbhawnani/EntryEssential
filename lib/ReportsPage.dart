@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart'; // for file path manipulation
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +17,7 @@ class ReportsPage extends StatefulWidget {
 
 class _ReportsPageState extends State<ReportsPage> {
   List<Map<String, dynamic>> _cars = [];
-
+  int i = 1;
   // SQLite database instance
   late Database database;
 
@@ -34,26 +37,26 @@ class _ReportsPageState extends State<ReportsPage> {
     // Open the database or create it if it doesn't exist
     database = await openDatabase(
       path,
-      version: 1,
+      version: i,
       onCreate: (db, version) async {
         // Create the cars table with appropriate columns
         await db.execute('''
-  CREATE TABLE cars (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    VehicleOwnerName TEXT,
-    VehicleNumber TEXT,
-    VehicleType TEXT,
-    TimeIn TEXT,
-    Address TEXT,
-    Make TEXT,
-    Color TEXT,
-    DriverName TEXT,
-    DriverPhone TEXT,
-    TimeOut TEXT,
-    fourNumber TEXT,
-    MarkColor TEXT,
-  )
-''');
+          CREATE TABLE cars (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            MobileNumber TEXT,
+            VehicleOwnerName TEXT,
+            VehicleNumber TEXT,
+            VehicleType TEXT,
+            TimeIn TEXT,
+            Address TEXT,
+            Make TEXT,
+            Color TEXT,
+            DriverName TEXT,
+            DriverPhone TEXT,
+            TimeOut TEXT,
+            fourNumber TEXT
+          )
+        ''');
       },
     );
     print('table created');
@@ -75,17 +78,15 @@ class _ReportsPageState extends State<ReportsPage> {
     setState(() {
       _cars = querySnapshot.docs.map((doc) => doc.data()).toList();
       print(_cars);
-      _cars[0].update(
-        'TimeIn',
-        (value) => value.toDate().toString(),
-      ); // Add comma if required
-      _cars[0]['TimeOut'] != null
-          ? _cars[0].update('TimeOut', (value) => value.toDate().toString())
-          : "";
-      _cars[0]['MarkColor'] = "";
+      for (var i = 0; i < _cars.length; i++) {
+        _cars[i].update('TimeIn', (value) => value.toDate().toString());
+        _cars[i]['TimeOut'] != null
+            ? _cars[i].update('TimeOut', (value) => value.toDate().toString())
+            : "";
+        _cars[i].remove('MarkColor');
+      }
+      print(_cars);
     });
-    await initDatabase();
-    await saveToDatabase(_cars);
   }
 
   Future<void> saveToDatabase(List<Map<String, dynamic>> cars) async {
@@ -93,10 +94,9 @@ class _ReportsPageState extends State<ReportsPage> {
       final data = Map<String, dynamic>.from(user); // Create a copy
       data.removeWhere(
           (key, value) => value == null); // Remove null key-value pairs
-      print('SQL Query: INSERT OR REPLACE INTO cars (...) VALUES (...)');
 
       await database.insert(
-        'cars',
+        'cars', // Use the correct table name
         data,
         conflictAlgorithm:
             ConflictAlgorithm.replace, // Update if already exists
@@ -105,6 +105,7 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 
   Future<void> downloadFromDatabase() async {
+    await saveToDatabase(_cars);
     final directory = await getExternalStorageDirectory();
     final filename = DateTime.now().toString() + '.csv';
     final path = join(directory!.path, filename);
@@ -124,41 +125,46 @@ class _ReportsPageState extends State<ReportsPage> {
       'DriverName',
       'DriverPhone',
       'TimeOut',
+      'MobileNumber'
     ];
     csvData.write(header.join(','));
     csvData.writeln();
     final results = await database.query('cars');
     for (var row in results) {
       // Use comma-separated string interpolation for each row
-      csvData.write('''
-      ${row['VehicleOwnerName'] ?? ''},
-      ${row['VehicleNumber'] ?? ''},
-      ${row['TimeIn']?.toString() ?? ''},
-      ${row['Address'] ?? ''},
-      ${row['Make'] ?? ''},
-      ${row['Color'] ?? ''},
-      ${row['DriverName'] ?? ''},
-      ${row['DriverPhone'] ?? ''},
-      ${row['TimeOut']?.toString() ?? ''}
-      ''');
+      csvData.write([
+        row['VehicleOwnerName'] ?? '',
+        row['VehicleNumber'] ?? '',
+        row['TimeIn']?.toString() ?? '',
+        row['Address'] ?? '',
+        row['Make'] ?? '',
+        row['Color'] ?? '',
+        row['DriverName'] ?? '',
+        row['DriverPhone'] ?? '',
+        row['TimeOut']?.toString() ?? '',
+        row['MobileNumber'] ?? ''
+      ].join(','));
+      csvData.writeln();
     }
-
     await file.writeAsString(csvData.toString());
+  }
 
-    print('Report download');
+  Future<void> resetTable() async {
+    await database.delete('cars');
+    print('All entries deleted from cars table');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Report'),
+        title: Text('Car Report'),
         actions: [
           IconButton(
             icon: Icon(Icons.download),
             onPressed: () => downloadFromDatabase(),
           ),
-        ], // Add download button to action bar
+        ],
       ),
       body: _cars.isEmpty
           ? Center(child: CircularProgressIndicator())
@@ -166,65 +172,67 @@ class _ReportsPageState extends State<ReportsPage> {
               itemCount: _cars.length,
               itemBuilder: (context, index) {
                 final user = _cars[index];
-                print(user);
+
                 return ListTile(
                   title: Center(
                     child: Text(user['VehicleOwnerName'] ?? 'Unknown',
                         style: TextStyle(fontSize: 24)),
-                  ), // Access user data
-                  subtitle: Column(children: [
-                    Text('Vehicle Number: ${user['VehicleNumber']}',
-                        style: TextStyle(fontSize: 18)),
-                    // Text('TimeIn: ${user['TimeIn']}',
-                    //     style: TextStyle(fontSize: 18)),
-                    user['Address'] != null
-                        ? Text('Address: ${user['Address']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "Address: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                    user['Make'] != null
-                        ? Text('Vehicle Make: ${user['Make']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "Vehicle Make: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                    user['Color'] != null
-                        ? Text('Vehicle Color: ${user['Color']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "Vehicle Color: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                    user['DriverName'] != null
-                        ? Text('Driver Name: ${user['DriverName']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "Driver Name: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                    user['DriverPhone'] != null
-                        ? Text('Driver Phone: ${user['DriverPhone']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "Driver Phone: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                    Text('TimeIn: ${user['TimeIn']}',
-                        style: TextStyle(fontSize: 18)),
-                    user['TimeOut'] != null
-                        ? Text('TimeOut: ${user['TimeOut']}',
-                            style: TextStyle(fontSize: 18))
-                        : Text(
-                            "TimeOut: ",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                  ]),
+                  ),
+                  subtitle: Column(
+                    children: [
+                      Text('Vehicle Number: ${user['VehicleNumber']}',
+                          style: TextStyle(fontSize: 18)),
+                      Text('TimeIn: ${user['TimeIn'].toString()}',
+                          style: TextStyle(fontSize: 18)),
+                      user['Address'] != null
+                          ? Text('Address: ${user['Address']}',
+                              style: TextStyle(fontSize: 18))
+                          : Text(
+                              "Address: ",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                      user['Make'] != null
+                          ? Text('Vehicle Make: ${user['Make']}',
+                              style: TextStyle(fontSize: 18))
+                          : Text(
+                              "Vehicle Make: ",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                      user['Color'] != null
+                          ? Text('Vehicle Color: ${user['Color']}',
+                              style: TextStyle(fontSize: 18))
+                          : Text(
+                              "Vehicle Color: ",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                      user['DriverName'] != null
+                          ? Text('Driver Name: ${user['DriverName']}',
+                              style: TextStyle(fontSize: 18))
+                          : Text(
+                              "Driver Name: ",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                      user['DriverPhone'] != null
+                          ? Text('Driver Phone: ${user['DriverPhone']}',
+                              style: TextStyle(fontSize: 18))
+                          : Text(
+                              "Driver Phone: ",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                      if (user['TimeOut'] != null)
+                        Text('TimeOut: ${user['TimeOut']}',
+                            style: TextStyle(fontSize: 18)),
+                    ],
+                  ),
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          resetTable();
+        },
+        child: Icon(CupertinoIcons.trash_fill),
+      ),
     );
   }
 }

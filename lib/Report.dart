@@ -32,7 +32,6 @@ class _ReportsState extends State<Reports> {
     setState(() {
       _cars = querySnapshot.docs.map((doc) => doc.data()).toList();
     });
-    // await saveToFile(_cars);
   }
 
   @override
