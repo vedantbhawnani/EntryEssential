@@ -1,14 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart'; // for file path manipulation
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sqflite/sqflite.dart';
+
+import 'package:rssb/Helper/Helper.dart';
 
 class ReportsPage extends StatefulWidget {
   @override
@@ -18,48 +16,17 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   List<Map<String, dynamic>> _cars = [];
   int i = 1;
-  // SQLite database instance
-  late Database database;
 
   @override
   void initState() {
     super.initState();
-    _fetchcars();
-    initDatabase();
-  }
-
-  Future<void> initDatabase() async {
-    // Get a path to a directory where we can store our database file
-    final directory = await getApplicationDocumentsDirectory();
-    final path = join(directory.path, 'ReportsPage.db');
-
-    print(path);
-    // Open the database or create it if it doesn't exist
-    database = await openDatabase(
-      path,
-      version: i,
-      onCreate: (db, version) async {
-        // Create the cars table with appropriate columns
-        await db.execute('''
-          CREATE TABLE cars (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            MobileNumber TEXT,
-            VehicleOwnerName TEXT,
-            VehicleNumber TEXT,
-            VehicleType TEXT,
-            TimeIn TEXT,
-            Address TEXT,
-            Make TEXT,
-            Color TEXT,
-            DriverName TEXT,
-            DriverPhone TEXT,
-            TimeOut TEXT,
-            fourNumber TEXT
-          )
-        ''');
-      },
-    );
-    print('table created');
+    if (DatabaseHelper.isInitialized) {
+      _fetchcars();
+    } else {
+      DatabaseHelper.instance.initDatabase().then((_) {
+        _fetchcars();
+      });
+    }
   }
 
   Future<void> _fetchcars() async {
@@ -77,102 +44,104 @@ class _ReportsPageState extends State<ReportsPage> {
         .get();
     setState(() {
       _cars = querySnapshot.docs.map((doc) => doc.data()).toList();
-      print(_cars);
       for (var i = 0; i < _cars.length; i++) {
         _cars[i].update('TimeIn', (value) => value.toDate().toString());
         _cars[i]['TimeOut'] != null
             ? _cars[i].update('TimeOut', (value) => value.toDate().toString())
             : "";
         _cars[i].remove('MarkColor');
+        _cars[i].remove('fourNumber');
+        _cars[i].remove('DriverPhone');
+        _cars[i].remove('Make');
+        _cars[i].remove('Color');
       }
-      print(_cars);
     });
   }
 
-  Future<void> saveToDatabase(List<Map<String, dynamic>> cars) async {
-    for (var user in cars) {
-      final data = Map<String, dynamic>.from(user); // Create a copy
-      data.removeWhere(
-          (key, value) => value == null); // Remove null key-value pairs
+  Future<String> downloadFromDatabase() async {
+    DateTime time = DateTime.now();
+    final existingData = await DatabaseHelper.instance.database.query('cars');
+    final newDataToSave = _cars.where((car) => !existingData.any((row) => row['VehicleNumber'] == car['VehicleNumber']));
 
-      await database.insert(
-        'cars', // Use the correct table name
-        data,
-        conflictAlgorithm:
-            ConflictAlgorithm.replace, // Update if already exists
-      );
+    if (newDataToSave.isNotEmpty) {
+      // Save only new or updated entries
+      await DatabaseHelper.instance.saveToDatabase(newDataToSave.toList());
     }
-  }
-
-  Future<void> downloadFromDatabase() async {
-    await saveToDatabase(_cars);
+    // await DatabaseHelper.instance.saveToDatabase(_cars);
     final directory = await getExternalStorageDirectory();
-    final filename = DateTime.now().toString() + '.csv';
-    final path = join(directory!.path, filename);
+    final filename =
+        '${time.year}-${time.month}-${time.day}-${time.hour}-${time.day}-${time.minute}-${time.second}';
+    final path = join(directory!.path, 'Report-${filename}.csv');
     final file = File(path);
 
-    // Request storage permission if needed
     await Permission.storage.request();
+    await Permission.manageExternalStorage.request();
 
     final csvData = StringBuffer();
     final header = [
-      'VehicleOwnerName',
       'VehicleNumber',
+      'VehicleOwnerName',
+      'MobileNumber',
+      'Gate',
+      'VehicleType',
       'TimeIn',
-      'Address',
-      'Make',
-      'Color',
-      'DriverName',
-      'DriverPhone',
-      'TimeOut',
-      'MobileNumber'
+      'User'
     ];
     csvData.write(header.join(','));
     csvData.writeln();
-    final results = await database.query('cars');
+    final results = await DatabaseHelper.instance.database.query('cars');
     for (var row in results) {
-      // Use comma-separated string interpolation for each row
+      print('Row ${row}');
       csvData.write([
-        row['VehicleOwnerName'] ?? '',
         row['VehicleNumber'] ?? '',
+        row['VehicleOwnerName'] ?? '',
+        row['MobileNumber'] ?? '',
+        row['Gate'] ?? '',
+        row['VehicleType'] ?? '',
         row['TimeIn']?.toString() ?? '',
-        row['Address'] ?? '',
-        row['Make'] ?? '',
-        row['Color'] ?? '',
-        row['DriverName'] ?? '',
-        row['DriverPhone'] ?? '',
-        row['TimeOut']?.toString() ?? '',
-        row['MobileNumber'] ?? ''
+        row['User'] ?? ''
       ].join(','));
       csvData.writeln();
     }
-    await file.writeAsString(csvData.toString());
-  }
 
-  Future<void> resetTable() async {
-    await database.delete('cars');
-    print('All entries deleted from cars table');
+    try {
+      await file.writeAsString(csvData.toString());
+    } catch (e) {
+      print(e);
+    }
+
+    return path;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Car Report'),
+        title: Text('Report'),
         actions: [
           IconButton(
             icon: Icon(Icons.download),
-            onPressed: () => downloadFromDatabase(),
+            onPressed: () => downloadFromDatabase().then((value) =>
+                ScaffoldMessenger.of(context).showMaterialBanner(MaterialBanner(
+                  content: Text('File stored in ${value}'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => ScaffoldMessenger.of(context)
+                          .removeCurrentMaterialBanner(),
+                      child: Text('DISMISS'),
+                    ),
+                  ],
+                ))),
           ),
         ],
       ),
       body: _cars.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: Text('No entries yet.'))
           : ListView.builder(
               itemCount: _cars.length,
               itemBuilder: (context, index) {
                 final user = _cars[index];
-
+                print(user['Make']);
                 return ListTile(
                   title: Center(
                     child: Text(user['VehicleOwnerName'] ?? 'Unknown',
@@ -184,55 +153,34 @@ class _ReportsPageState extends State<ReportsPage> {
                           style: TextStyle(fontSize: 18)),
                       Text('TimeIn: ${user['TimeIn'].toString()}',
                           style: TextStyle(fontSize: 18)),
-                      user['Address'] != null
-                          ? Text('Address: ${user['Address']}',
-                              style: TextStyle(fontSize: 18))
-                          : Text(
-                              "Address: ",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                      user['Make'] != null
-                          ? Text('Vehicle Make: ${user['Make']}',
-                              style: TextStyle(fontSize: 18))
-                          : Text(
-                              "Vehicle Make: ",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                      user['Color'] != null
-                          ? Text('Vehicle Color: ${user['Color']}',
-                              style: TextStyle(fontSize: 18))
-                          : Text(
-                              "Vehicle Color: ",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                      user['DriverName'] != null
-                          ? Text('Driver Name: ${user['DriverName']}',
-                              style: TextStyle(fontSize: 18))
-                          : Text(
-                              "Driver Name: ",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                      user['DriverPhone'] != null
-                          ? Text('Driver Phone: ${user['DriverPhone']}',
-                              style: TextStyle(fontSize: 18))
-                          : Text(
-                              "Driver Phone: ",
-                              style: TextStyle(fontSize: 18),
-                            ),
+                      Text('Gate Number: ${user['Gate']}',
+                          style: TextStyle(fontSize: 18)),
+                      if (user['Address'] != null)
+                        Text('Address: ${user['Address']}',
+                            style: TextStyle(fontSize: 18)),
+                      if (user['Make'] != null)
+                        Text('Vehicle Make: ${user['Make']}',
+                            style: TextStyle(fontSize: 18)),
+                      if (user['Color'] != null)
+                        Text('Vehicle Color: ${user['Color']}',
+                            style: TextStyle(fontSize: 18)),
+                      if (user['DriverName'] != null)
+                        Text('DriverName: ${user['DriverName']}',
+                            style: TextStyle(fontSize: 18)),
+                      if (user['DriverPhone'] != null)
+                        Text('DriverPhone: ${user['DriverPhone']}',
+                            style: TextStyle(fontSize: 18)),
                       if (user['TimeOut'] != null)
                         Text('TimeOut: ${user['TimeOut']}',
+                            style: TextStyle(fontSize: 18)),
+                      if (user['User'] != null)
+                        Text('User: ${user['User']}',
                             style: TextStyle(fontSize: 18)),
                     ],
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          resetTable();
-        },
-        child: Icon(CupertinoIcons.trash_fill),
-      ),
     );
   }
 }

@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_scalable_ocr/flutter_scalable_ocr.dart';
 
-
 class OCR extends StatefulWidget {
   const OCR({super.key});
 
@@ -54,8 +53,10 @@ class _OCRState extends State<OCR> {
                   }),
               StreamBuilder<String>(
                 stream: controller.stream,
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  return Result(text: snapshot.data != null ? snapshot.data! : "");
+                builder:
+                    (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  return Result(
+                      text: snapshot.data != null ? snapshot.data! : "");
                 },
               )
             ],
@@ -75,16 +76,16 @@ class Result extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        debugPrint(text);
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));},
-        if (text.length > 4) {
-        Navigator.pop(context, text.substring(text.length - 4));}
-        if (text.length < 4) {
-        Navigator.pop(context, "");}
+        onPressed: () {
+          debugPrint(text);
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));},
+          if (text.length > 4) {
+            Navigator.pop(context, text.substring(text.length - 4));
+          }
+          if (text.length < 4) {
+            Navigator.pop(context, "");
+          }
         },
-      child: text.isEmpty? Text('Return') : Text('Read Data ${text}')
-    );    
+        child: text.isEmpty ? Text('Return') : Text('Read Data ${text}'));
   }
 }
-

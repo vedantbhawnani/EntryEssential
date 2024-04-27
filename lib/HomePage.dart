@@ -1,17 +1,13 @@
-import 'dart:convert';
-
+// ignore: file_names
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:rssb/ReportsPage.dart';
-import 'package:rssb/admin.dart';
-
-import 'OCR.dart';
-import 'Report.dart';
+import 'package:rssb/Helper/Helper.dart';
+import 'ReportsPage.dart';
+import 'admin.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String name;
+  HomePage({super.key, required this.name});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,39 +19,16 @@ class _HomePageState extends State<HomePage> {
   TextEditingController plateNumber = TextEditingController();
   final passwordController = TextEditingController();
   String correctPassword = "godisone";
+  bool _showSearchResults = false;
 
   List<Map<String, dynamic>> _searchResults = [];
-
-  void _awaitOCR(BuildContext context) async {
-    plateNumber.text = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => OCR()));
-  }
 
   List<String> list = <String>['2-wheeler', '3-wheeler', '4-wheeler'];
   Map<String, dynamic> userInfo = {};
   late String selectedType = list.first;
 
-  Future<List<Map<String, dynamic>>> searchVehicles(String number) async {
-    // Create a reference to the vehicles collection (assuming 'vehicles' is the correct collection)
-    final collection = FirebaseFirestore.instance
-        .collection('cars'); // Modified collection name
-
-    // Query the collection by number (assuming 'number' is the correct field name)
-    final querySnapshot =
-        await collection.where('fourNumber', isEqualTo: number).get();
-
-    // Extract data and document IDs from matching documents
-    final List<Map<String, dynamic>> vehiclesWithDocIds = [];
-    for (final doc in querySnapshot.docs) {
-      final vehicleData = doc.data();
-      final docId = doc.reference.id;
-      vehiclesWithDocIds.add({
-        ...vehicleData, // Spread existing vehicle data
-        'docId': docId, // Add document ID to the map
-      });
-    }
-    return vehiclesWithDocIds;
-  }
+  String selectedGate = "Gate 1";
+  final List<String> gateNumbers = ["Gate 1", "Gate 2", "Gate 3"];
 
   @override
   void initState() {
@@ -66,8 +39,36 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // Add appbar with drawer for reports and admin settings.
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          Spacer(), // Add Spacer before actions
+          PopupMenuButton<String>(
+            icon: Row(
+              children: [
+                Text(
+                  "$selectedGate",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_drop_down,
+                  size: 40,
+                ), // Add dropdown icon
+              ],
+            ),
+            onSelected: (value) => setState(() => selectedGate = value),
+            itemBuilder: (context) => gateNumbers
+                .map((gate) => PopupMenuItem<String>(
+                      value: gate,
+                      child: Text(gate),
+                    ))
+                .toList(),
+          ),
+          Spacer(flex: 4), // Add Spacer after actions
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           children: [
@@ -153,7 +154,6 @@ class _HomePageState extends State<HomePage> {
                                   MediaQuery.of(context).size.height / 28),
                           controller: plateNumber,
                           maxLength: 4,
-                          keyboardType: TextInputType.none,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
                             errorText: isValid ? null : 'Enter 4 digit number.',
@@ -168,18 +168,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Wrap(spacing: 5.0, runSpacing: 10.0, children: [
                     ElevatedButton(
-                      onPressed: () {
-                        _awaitOCR(context);
-                      },
-                      child: const Text('OCR', style: TextStyle(fontSize: 18)),
+                      onPressed: () => setState(() {
+                        _showSearchResults = false;
+                      }),
+                      child: Text('Cancel'),
                       style: ElevatedButton.styleFrom(
                           minimumSize: Size(
                               MediaQuery.of(context).size.width / 30,
                               MediaQuery.of(context).size.height / 10)),
                     ),
-                    // SizedBox(
-                    //   width: MediaQuery.of(context).size.width/50,
-                    // ),
                     ElevatedButton(
                         onPressed: () {
                           if (plateNumber.text.length > 0) {
@@ -202,218 +199,112 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SizedBox(height: 10),
-              _searchResults.isEmpty
-                  ? Text('No vehicles found')
-                  : SingleChildScrollView(
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final vehicleData = _searchResults[index];
-                            final plateNumber = vehicleData['VehicleNumber'];
-                            final phoneNumber = vehicleData['MobileNumber'];
-                            final ownerName = vehicleData['VehicleOwnerName'];
-                            final address = vehicleData['Address'];
-                            final make = vehicleData['Make'];
-                            final color = vehicleData['Color'];
-                            final driverName = vehicleData['DriverName'];
-                            final driverPhone = vehicleData['DriverPhone'];
-                            return ListTile(
-                              title: Text(
-                                  "Plate: $plateNumber\nOwner: $ownerName"),
-                              subtitle: Wrap(
-                                spacing: 5.0,
-                                runSpacing: 10.0,
-                                children: [
-                                  SizedBox(
-                                      width: MediaQuery.of(context).size.width /
-                                          24),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            vehicleData['MarkColor'] != null
-                                                ? Colors.green
-                                                : Colors.blueGrey),
-                                    onPressed: () async {
-                                      final docId = vehicleData[
-                                          'docId']; // Access docId from the map
-                                      // print(
-                                      //     'TimeIn for $plateNumber, Doc ID: $docId');
-                                      // Add your logic for handling TimeIn action (e.g., update data in Firebase with timestamp)
-                                      FirebaseFirestore.instance
-                                          .collection('cars')
-                                          .doc(docId)
-                                          .update({
+              Visibility(
+                visible: _showSearchResults,
+                child: SingleChildScrollView(
+                  child: Container(
+                    height: 250,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio:
+                              MediaQuery.of(context).size.height / 400),
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final vehicleData = _searchResults[index];
+                        final plateNumber = vehicleData['VehicleNumber'];
+                        final ownerName = vehicleData['VehicleOwnerName'];
+                        final make = vehicleData['Make'] ?? "";
+                        final phoneNumber = vehicleData['MobileNumber'] ?? "";
+                        // final address = vehicleData['Address'];
+                        // final color = vehicleData['Color'];
+                        // final driverName = vehicleData['DriverName'];
+                        // final driverPhone = vehicleData['DriverPhone'];
+                        return GridTile(
+                          footer: GridTileBar(
+                              title: Flexible(
+                            child: Text(
+                              "$make\n$ownerName\n$phoneNumber",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          )),
+                          child: Wrap(
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: vehicleData['MarkColor'] !=
+                                            null
+                                        ? Colors.green
+                                        : Color.fromARGB(255, 206, 219, 223)),
+                                onPressed: () async {
+                                  final docId = vehicleData['docId'];
+                                  FirebaseFirestore.instance
+                                      .collection('cars')
+                                      .doc(docId)
+                                      .update({
                                         'TimeIn': DateTime.now(),
                                         'MarkColor': true,
-                                      }).then((value) =>
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content:
-                                                      Text('TimeIn Data Added'),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                ),
-                                              ));
-                                    },
-                                    onLongPress: () async {
-                                      final docId = vehicleData[
-                                          'docId']; // Access docId from the map
-                                      FirebaseFirestore.instance
-                                          .collection('cars')
-                                          .doc(docId)
-                                          .update({
+                                        'Gate': selectedGate,
+                                        'User': widget.name
+                                      })
+                                      .then((value) => setState(() {
+                                            _showSearchResults = false;
+                                          }))
+                                      .then((value) =>
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content:
+                                                  Text('TimeIn Data Added'),
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                            ),
+                                          ));
+                                },
+                                onLongPress: () async {
+                                  final docId = vehicleData[
+                                      'docId']; // Access docId from the map
+                                  FirebaseFirestore.instance
+                                      .collection('cars')
+                                      .doc(docId)
+                                      .update({
                                         'TimeIn': FieldValue.delete(),
-                                        'MarkColor': FieldValue.delete()
-                                      }).then((value) =>
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  content: Text(
-                                                      'TimeIn Data Deleted'),
-                                                ),
-                                              ));
-                                    },
-                                    child: Text('TimeIn'),
-                                  ),
-                                  SizedBox(
-                                      width: MediaQuery.of(context).size.width /
-                                          7.5),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      final docId = vehicleData[
-                                          'docId']; // Access docId from the map
-                                      print(
-                                          'TimeOut for $plateNumber, Doc ID: $docId');
-                                      // Add your logic for handling TimeOut action (e.g., update data in Firebase with timestamp)
-                                      // You can use `FirebaseFirestore.instance.collection('vehicles').doc(docId).update(...)`
-                                      FirebaseFirestore.instance
-                                          .collection('cars')
-                                          .doc(docId)
-                                          .update({
-                                        'TimeOut': DateTime.now()
-                                      }).then((value) =>
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  content: Text(
-                                                      'TimeOut Data Added'),
-                                                ),
-                                              ));
-                                    },
-                                    child: Text('TimeOut'),
-                                  ),
-                                  SizedBox(
-                                      width: MediaQuery.of(context).size.width /
-                                          20),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      print(vehicleData);
-                                      final docId = vehicleData[
-                                          'docId']; // Access docId from the map
-                                      // Add your logic for handling TimeIn action (e.g., update data in Firebase with timestamp)
-                                      TextEditingController nameController =
-                                          TextEditingController(
-                                              text: ownerName);
-                                      TextEditingController numberController =
-                                          TextEditingController(
-                                              text: phoneNumber);
-                                      TextEditingController plateController =
-                                          TextEditingController(
-                                              text: plateNumber);
-                                      TextEditingController addressController =
-                                          TextEditingController(text: address);
-                                      TextEditingController makeController =
-                                          TextEditingController(text: make);
-                                      TextEditingController colorController =
-                                          TextEditingController(text: color);
-                                      TextEditingController
-                                          driverNameController =
-                                          TextEditingController(
-                                              text: driverName);
-                                      TextEditingController
-                                          driverPhoneController =
-                                          TextEditingController(
-                                              text: driverPhone);
-
-                                      UpdateForm(
-                                        context,
-                                        nameController,
-                                        numberController,
-                                        plateController,
-                                        addressController,
-                                        makeController,
-                                        colorController,
-                                        driverNameController,
-                                        driverPhoneController,
-                                        docId,
-                                      );
-                                    },
-                                    child: Text('Update Car Info'),
-                                  ),
-                                  SizedBox(
-                                      width: MediaQuery.of(context).size.width /
-                                          30),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      await CheckDelete(context, vehicleData);
-                                    },
-                                    child: Text('Delete Car Data'),
-                                  ),
-                                ],
+                                        'MarkColor': FieldValue.delete(),
+                                        'User': FieldValue.delete(),
+                                      })
+                                      .then((value) => setState(() {
+                                            _showSearchResults = false;
+                                          }))
+                                      .then((value) =>
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              content:
+                                                  Text('TimeIn Data Deleted'),
+                                            ),
+                                          ));
+                                },
+                                child: Text('$plateNumber'),
                               ),
-                            );
-                          }),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-              const SizedBox(height: 10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
               Numpad(),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
             ]),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            await resetFirebaseValues().then(
-                (value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Values resetted.'),
-                      behavior: SnackBarBehavior.floating,
-                    )));
-          },
-          child: Icon(CupertinoIcons.refresh_thick)),
     );
-  }
-
-  Future<void> resetFirebaseValues() async {
-    final firestore = FirebaseFirestore.instance;
-    final today = DateTime.now();
-
-    final querySnapshot = await firestore
-        .collection('cars')
-        .where('TimeIn',
-            isGreaterThanOrEqualTo:
-                DateTime(today.year, today.month, today.day))
-        .where('TimeIn',
-            isLessThanOrEqualTo:
-                DateTime(today.year, today.month, today.day, 23, 59, 59))
-        .get();
-
-    final batch = firestore.batch();
-    for (var doc in querySnapshot.docs) {
-      batch.update(doc.reference, {
-        'TimeIn': FieldValue.delete(),
-        'TimeOut': FieldValue.delete(), // Delete TimeOut
-        'MarkColor': FieldValue.delete(), // Set MarkColor to empty string
-      });
-    }
-
-    await batch.commit();
-    print('Firebase values reset successfully!');
   }
 
   Column Numpad() {
@@ -464,15 +355,14 @@ class _HomePageState extends State<HomePage> {
       ),
       const SizedBox(height: 10),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // SizedBox(
-          //   width: 0,
-          // ),
+          Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                shape: StadiumBorder(),
-                minimumSize: Size(120, 75),
+                shape: RoundedRectangleBorder(),
+                minimumSize: Size(MediaQuery.of(context).size.width / 3.5,
+                    MediaQuery.of(context).size.height / 13),
                 fixedSize: Size(MediaQuery.of(context).size.width / 8,
                     MediaQuery.of(context).size.height / 20)),
             child: Text('0', style: TextStyle(fontSize: 26)),
@@ -484,17 +374,23 @@ class _HomePageState extends State<HomePage> {
                       TextPosition(offset: plateNumber.text.length)));
             },
           ),
+          Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                shape: StadiumBorder(),
-                minimumSize: Size(120, 60),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
+                minimumSize: Size(MediaQuery.of(context).size.width / 2,
+                    MediaQuery.of(context).size.height / 13),
                 fixedSize: Size(MediaQuery.of(context).size.width / 8,
-                    MediaQuery.of(context).size.height / 20)),
+                    MediaQuery.of(context).size.height / 20),
+                backgroundColor: const Color.fromARGB(255, 46, 123, 213)),
             onPressed: () async {
               final number = plateNumber.text;
-              final results = await searchVehicles(number);
+              final results =
+                  await DatabaseHelper.instance.searchVehicles(number);
               setState(() {
                 _searchResults = results;
+                _showSearchResults = true;
               });
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(plateNumber.text),
@@ -502,12 +398,39 @@ class _HomePageState extends State<HomePage> {
               ));
               plateNumber.text = "";
             },
-            child: Text('Search', style: TextStyle(fontSize: 22)),
+            child: Text('Search',
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87)),
           ),
+          Spacer(),
         ],
       ),
     ]);
   }
+
+  ElevatedButton numButton({required String number}) => ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(),
+            minimumSize: Size(MediaQuery.of(context).size.width / 3.5,
+                MediaQuery.of(context).size.height / 13)),
+        child: Text(number, style: TextStyle(fontSize: 26)),
+        onPressed: () {
+          if (plateNumber.text.length < 4) {
+            plateNumber.text += number;
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Maximum length reached'),
+              duration: Duration(milliseconds: 500),
+            ));
+          }
+          plateNumber.value = TextEditingValue(
+              text: plateNumber.text,
+              selection: TextSelection.fromPosition(
+                  TextPosition(offset: plateNumber.text.length)));
+        },
+      );
 
   Future<dynamic> UpdateForm(
       BuildContext context,
@@ -560,7 +483,6 @@ class _HomePageState extends State<HomePage> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Vehicle Make',
-                            //   errorText: 'Field cannot be empty!',
                           )),
                       SizedBox(height: 15),
                       TextField(
@@ -568,7 +490,6 @@ class _HomePageState extends State<HomePage> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Vehicle Color',
-                            //   errorText: 'Field cannot be empty!',
                           )),
                       SizedBox(height: 15),
                       Text('Driver Details'),
@@ -577,7 +498,6 @@ class _HomePageState extends State<HomePage> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Driver Name',
-                          // errorText: 'Field cannot be empty!',
                         ),
                       ),
                       SizedBox(height: 15),
@@ -586,7 +506,6 @@ class _HomePageState extends State<HomePage> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Driver Phone Number',
-                            //   errorText: 'Field cannot be empty!',
                           )),
                       SizedBox(height: 10),
                       DropdownButtonFormField<String>(
@@ -775,6 +694,9 @@ class _HomePageState extends State<HomePage> {
                           .collection('cars')
                           .doc(docId)
                           .update(userInfo)
+                          .then((value) => setState(() {
+                                _showSearchResults = false;
+                              }))
                           .then((value) =>
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -798,17 +720,4 @@ class _HomePageState extends State<HomePage> {
               ],
             ));
   }
-
-  ElevatedButton numButton({required String number}) => ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            shape: StadiumBorder(), minimumSize: Size(120, 75)),
-        child: Text(number, style: TextStyle(fontSize: 26)),
-        onPressed: () {
-          plateNumber.text += number;
-          plateNumber.value = TextEditingValue(
-              text: plateNumber.text,
-              selection: TextSelection.fromPosition(
-                  TextPosition(offset: plateNumber.text.length)));
-        },
-      );
 }
