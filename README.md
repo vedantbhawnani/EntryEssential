@@ -35,15 +35,18 @@ O
 
 **Screenshots:**
 
-* **Admin Access Screen:** ![admin](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759)
+* **Admin Access Screen:** <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759" width=200>
     * Displays buttons for adding new vehicles, updating vehicle records, deleting vehicles, and adding new users.
-* **Gate Management Screen:** ![gate_1_screen.png](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf "Gate Management Screen" width="250")
+* **Gate Management Screen:**
+  <img src = "https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf" width="250">
     * Shows the active gate (e.g., Gate 1), vehicle count, and buttons for cancelling entry, deleting entries, and searching for vehicles.
 * **Search Screen:** 
     * Provides a search bar for entering registration numbers and displays results with relevant vehicle and owner information. 
-* **Report Screen:** <img src = "https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf" width="200">  
+* **Report Screen:**
+  <img src = "https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf" width="200">  
     * Displays a detailed report with vehicle number, entry/exit times, gate number, and associated user information.
-* **Login Screen:** <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4" width="100">
+* **Login Screen:**
+  <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4" width="200">
     * Allows users to enter their email address and password to authenticate.
 
 **Future Development:**
