@@ -30,7 +30,7 @@ O
 
 * **Framework:** Flutter
 * **Language:** Dart
-* **Dependencies:** `firebase_auth`, `cloud_firestore`, `shared_preferences`, `flutter_localizations`, and other standard Flutter packages.
+* **Dependencies:** `firebase_auth`, `cloud_firestore`, and other standard Flutter packages.
 
 **Screenshots:**\
 <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4" width="200">
