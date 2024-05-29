@@ -1,4 +1,4 @@
-## EntryEssential - A Flutter Application
+![loginpage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/a75ad17e-a3ea-48df-8471-67b8148a2587)## EntryEssential - A Flutter Application
 
 This project presents a comprehensive Flutter application designed for efficient gate management at facilities with controlled entry and exit. The application aims to digitize traditional gate management processes, improving accuracy, security, and reporting capabilities.
 
@@ -35,15 +35,15 @@ The GMS primarily targets:
 
 **Screenshots:**
 
-* **Admin Access Screen:** <img src="admin_access_screen.png" width="300"> 
+* **Admin Access Screen:** ![admin](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759)
     * Displays buttons for adding new vehicles, updating vehicle records, deleting vehicles, and adding new users.
-* **Gate Management Screen:** <img src="gate_1_screen.png" width="300">
+* **Gate Management Screen:** ![homepage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/5fb49c11-705b-4340-8352-5fbd48dce2eb)
     * Shows the active gate (e.g., Gate 1), vehicle count, and buttons for cancelling entry, deleting entries, and searching for vehicles.
-* **Search Screen:** <img src="search_screen.png" width="300">
+* **Search Screen:** 
     * Provides a search bar for entering registration numbers and displays results with relevant vehicle and owner information. 
-* **Report Screen:** <img src="report_screen.png" width="300">
+* **Report Screen:** ![reports_page_with_download_button](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf)
     * Displays a detailed report with vehicle number, entry/exit times, gate number, and associated user information.
-* **Login Screen:** <img src="login_screen.png" width="300">
+* **Login Screen:** <img src="login_screen.png" width="300">![loginpage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4)
     * Allows users to enter their email address and password to authenticate.
 
 **Future Development:**
