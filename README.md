@@ -4,7 +4,7 @@ This project presents a comprehensive Flutter application designed for efficient
 
 **Project Overview:**
 
-The Gate Management System (GMS) is designed to streamline the process of vehicle entry and exit at gated facilities. It provides a user-friendly interface for authorized personnel to:
+EntryEssentials is designed to streamline the process of vehicle entry and exit at gated facilities. It provides a user-friendly interface for authorized personnel to:
 
 * **Register Vehicles:** Add new vehicle records with registration numbers and owner details.
 * **Track Vehicle Movements:**  Record the entry and exit times of vehicles at specific gates.
@@ -13,7 +13,7 @@ The Gate Management System (GMS) is designed to streamline the process of vehicl
 
 **Target Users:**
 
-The GMS primarily targets:
+The app primarily targets:
 
 * **Facility Security Personnel:** To manage vehicle access and record entries/exits.
 * **Facility Administrators:** To monitor gate activity, generate reports, and manage user accounts.
@@ -56,4 +56,4 @@ O
 
 **Contributions:**
 
-For any contributions to enhance the Gate Management System, feel free to open an issue or submit a pull request with any bug fixes, feature suggestions, or improvements.
+For any contributions to enhance EntryEssentials, feel free to open an issue or submit a pull request with any bug fixes, feature suggestions, or improvements.
