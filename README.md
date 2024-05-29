@@ -41,9 +41,9 @@ O
     * Shows the active gate (e.g., Gate 1), vehicle count, and buttons for cancelling entry, deleting entries, and searching for vehicles.
 * **Search Screen:** 
     * Provides a search bar for entering registration numbers and displays results with relevant vehicle and owner information. 
-* **Report Screen:** ![reports_page_with_download_button](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf "Report Screen" width="200")  
+* **Report Screen:** <img src = "https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf" width="200">  
     * Displays a detailed report with vehicle number, entry/exit times, gate number, and associated user information.
-* **Login Screen:** <img src="login_screen.png" width="300">![loginpage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4)
+* **Login Screen:** <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4" width="100">
     * Allows users to enter their email address and password to authenticate.
 
 **Future Development:**
@@ -54,12 +54,4 @@ O
 
 **Contributions:**
 
-We welcome contributions to enhance the Gate Management System! Feel free to open an issue or submit a pull request with any bug fixes, feature suggestions, or improvements.
-
-**Contact:**
-
-[Your GitHub Username]
-
-**Note:**
-
-Remember to replace the placeholder filenames with the actual filenames of your screenshots. You can add or remove sections as needed based on your project's specific details. 
+For any contributions to enhance the Gate Management System, feel free to open an issue or submit a pull request with any bug fixes, feature suggestions, or improvements.
