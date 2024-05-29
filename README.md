@@ -31,11 +31,13 @@ O
 * **Framework:** Flutter
 * **Language:** Dart
 * **Dependencies:** `firebase_auth`, `cloud_firestore`, `shared_preferences`, `flutter_localizations`, and other standard Flutter packages.
-* **Architecture:** Model-View-ViewModel (MVVM)
 
 **Screenshots:**
-
-* **Admin Access Screen:** <img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759" width=200>
+<img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/eb03bf47-1af4-4aa4-8d96-bc112958d0c4" width="200">
+<img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/85b491a4-f101-47f5-97c2-38dcad4266ff" width = "200">
+<img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759" width=200>
+<img src="https://github.com/vedantbhawnani/EntryEssential/assets/104969397/0e912216-5a52-48f9-9936-ca53f8cc3d5d" width="200">
+* **Admin Access Screen:** 
     * Displays buttons for adding new vehicles, updating vehicle records, deleting vehicles, and adding new users.
 * **Gate Management Screen:**
   <img src = "https://github.com/vedantbhawnani/EntryEssential/assets/104969397/1695b0fd-63da-4fdb-a663-42496ed90daf" width="250">
