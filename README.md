@@ -25,7 +25,7 @@ The GMS primarily targets:
 * **Gate Management:** Track vehicle movements at multiple gates, recording entry and exit times, and associated gate numbers.
 * **Search Functionality:**  Efficiently search for vehicle information based on registration number, owner name, or specific dates.
 * **Report Generation:** Generate detailed reports on vehicle activity, including entry/exit times, gate usage, and user actions.
-
+O
 **Technology Stack:**
 
 * **Framework:** Flutter
@@ -35,7 +35,7 @@ The GMS primarily targets:
 
 **Screenshots:**
 
-* **Admin Access Screen:** ![admin](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759 =250x250)
+* **Admin Access Screen:** ![admin](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/8bcc5d3f-4231-4d15-91fc-d7046ac4b759 width="300")
     * Displays buttons for adding new vehicles, updating vehicle records, deleting vehicles, and adding new users.
 * **Gate Management Screen:** ![homepage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/5fb49c11-705b-4340-8352-5fbd48dce2eb)
     * Shows the active gate (e.g., Gate 1), vehicle count, and buttons for cancelling entry, deleting entries, and searching for vehicles.
