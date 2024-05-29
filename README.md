@@ -1,4 +1,4 @@
-![loginpage](https://github.com/vedantbhawnani/EntryEssential/assets/104969397/a75ad17e-a3ea-48df-8471-67b8148a2587)## EntryEssential - A Flutter Application
+## EntryEssential - A Flutter Application
 
 This project presents a comprehensive Flutter application designed for efficient gate management at facilities with controlled entry and exit. The application aims to digitize traditional gate management processes, improving accuracy, security, and reporting capabilities.
 
