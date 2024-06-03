@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:rssb/Pages/HomePage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,72 +9,35 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  Future<void> _signInWithEmailAndPassword() async {
+    try {
+      final email = _emailController.text;
+      final password = _passwordController.text;
 
-  @override
-  void initState() {
-    super.initState();
-    Firebase.initializeApp();
-  }
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-  @override
-  void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loginUser() async {
-    if (_formKey.currentState!.validate()) {
-      final username = usernameController.text;
-      final password = passwordController.text;
-
-      try {
-        final credentialsCollection =
-            FirebaseFirestore.instance.collection('credentials');
-        final docSnapshot = await credentialsCollection.doc(username).get();
-
-        if (docSnapshot.exists) {
-          final storedUsername = docSnapshot.data()!['username'];
-          final storedHashedPassword = docSnapshot.data()!['hashedPassword'];
-
-          if (username != storedUsername) {
-            throw Exception('Username does not match.');
-          }
-
-          final hashedPassword = await _hashPassword(password);
-
-          if (hashedPassword != storedHashedPassword) {
-            throw Exception('Incorrect password.');
-          }
-
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: '$username@gmail.com', password: password); //
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login successful!')),
-          );
-
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: ((context) => HomePage(name: username))));
-        } else {
-          throw Exception('Username not found.');
-        }
-      } on Exception catch (error) {
-        print('Error logging in user: $error');
+      // Navigate to the next page after successful login
+      Navigator.push(context,
+          MaterialPageRoute(builder: ((context) => HomePage(name: email))));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.toString())),
-        );
+            SnackBar(content: Text('No user found for that email.')));
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that email.');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Wrong password provided.')));
+      } else {
+        print(e.code);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed. Please try again.')));
       }
     }
-  }
-
-  Future<String> _hashPassword(String password) async {
-    return 'hashed_$password';
   }
 
   @override
@@ -92,22 +53,27 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               TextFormField(
-                controller: usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
                 validator: (value) =>
-                    value!.isEmpty ? 'Please enter a username' : null,
+                    value!.isEmpty ? 'Please enter your email' : null,
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 10.0),
               TextFormField(
-                controller: passwordController,
+                controller: _passwordController,
                 decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) =>
-                    value!.isEmpty ? 'Please enter a password' : null,
+                    value!.isEmpty ? 'Please enter your password' : null,
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: _loginUser,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _signInWithEmailAndPassword();
+                  }
+                },
                 child: Text('Login'),
               ),
             ],

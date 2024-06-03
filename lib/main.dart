@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+// import 'package:rssb/Pages/HomePage.dart';
 import 'Helper/firebase_options.dart';
 
 import 'package:rssb/Pages/Login/LoginPage.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      // home: HomePage(name: 'vedant',),
       home: LoginPage(),
     );
   }

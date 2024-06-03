@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class AddUserPage extends StatefulWidget {
@@ -11,7 +11,6 @@ class AddUserPage extends StatefulWidget {
 class _AddUserPageState extends State<AddUserPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -23,7 +22,6 @@ class _AddUserPageState extends State<AddUserPage> {
 
   @override
   void dispose() {
-    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -31,7 +29,6 @@ class _AddUserPageState extends State<AddUserPage> {
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      final name = nameController.text;
       final email = emailController.text;
       final password = passwordController.text;
 
@@ -39,18 +36,18 @@ class _AddUserPageState extends State<AddUserPage> {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        final credentialsCollection =
-            FirebaseFirestore.instance.collection('credentials');
+        // final credentialsCollection =
+        //     FirebaseFirestore.instance.collection('credentials');
 
-        final hashedPassword = await _hashPassword(password);
+        // final hashedPassword = await _hashPassword(password);
 
-        await credentialsCollection.doc(name).set({
-          'username': name,
-          'hashedPassword': hashedPassword,
-        });
+        // await credentialsCollection.doc(name).set({
+        //   'username': name,
+        //   'hashedPassword': hashedPassword,
+        // });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User created successfully!')),
+          const SnackBar(content: Text('User created successfully!')),
         );
 
         Navigator.pop(context);
@@ -71,40 +68,40 @@ class _AddUserPageState extends State<AddUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Username'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a username' : null,
-              ),
-              SizedBox(height: 16.0),
+              // TextFormField(
+              //   controller: nameController,
+              //   decoration: InputDecoration(labelText: 'Username'),
+              //   validator: (value) =>
+              //       value!.isEmpty ? 'Please enter a username' : null,
+              // ),
+              const SizedBox(height: 16.0),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter an email' : null,
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextFormField(
                 controller: passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true, // Hide password input
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a password' : null,
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _signUp,
-                child: Text('Sign Up'),
+                child: const Text('Sign Up'),
               ),
             ],
           ),

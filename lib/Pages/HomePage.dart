@@ -1,6 +1,10 @@
 // ignore: file_names
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rssb/Helper/Helper.dart';
 import 'ReportsPage.dart';
 import 'admin.dart';
@@ -38,273 +42,373 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        actions: [
-          Spacer(), // Add Spacer before actions
-          PopupMenuButton<String>(
-            icon: Row(
-              children: [
-                Text(
-                  "$selectedGate",
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          actions: [
+            const Spacer(), // Add Spacer before actions
+            PopupMenuButton<String>(
+              icon: Row(
+                children: [
+                  Text(
+                    "$selectedGate",
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.arrow_drop_down,
-                  size: 40,
-                ), // Add dropdown icon
-              ],
-            ),
-            onSelected: (value) => setState(() => selectedGate = value),
-            itemBuilder: (context) => gateNumbers
-                .map((gate) => PopupMenuItem<String>(
-                      value: gate,
-                      child: Text(gate),
-                    ))
-                .toList(),
-          ),
-          Spacer(flex: 4), // Add Spacer after actions
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 40,
+                  ), // Add dropdown icon
+                ],
               ),
-              child: Text('Drawer Header'),
+              onSelected: (value) => setState(() => selectedGate = value),
+              itemBuilder: (context) => gateNumbers
+                  .map((gate) => PopupMenuItem<String>(
+                        value: gate,
+                        child: Text(gate),
+                      ))
+                  .toList(),
             ),
-            ListTile(
-              title: const Text('Admin Access'),
-              onTap: () async {
-                await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: Text('Enter Password'),
-                          content: TextField(
-                            controller: passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(labelText: 'Password'),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                final enteredPassword = passwordController.text;
-                                if (enteredPassword == correctPassword) {
-                                  passwordController.text = "";
-
-                                  Navigator.pop(context);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              Admin())); // Navigate
-                                } else {
-                                  // Show error message
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text('Incorrect password'),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text('OK'),
-                            ),
-                          ],
-                        ));
-              },
-            ),
-            ListTile(
-              title: const Text('Report'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ReportsPage()));
-              },
-            ),
+            const Spacer(flex: 4), // Add Spacer after actions
           ],
         ),
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.zero,
-            child: Column(children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width / 30,
-                        right: MediaQuery.of(context).size.width / 30),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: TextField(
-                          style: TextStyle(
-                              fontSize:
-                                  MediaQuery.of(context).size.height / 28),
-                          controller: plateNumber,
-                          maxLength: 4,
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            errorText: isValid ? null : 'Enter 4 digit number.',
-                            label: Text(''),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              ListTile(
+                title: const Text('Admin Access'),
+                onTap: () async {
+                  await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: const Text('Enter Password'),
+                            content: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              decoration:
+                                  const InputDecoration(labelText: 'Password'),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  final enteredPassword =
+                                      passwordController.text;
+                                  if (enteredPassword == correctPassword) {
+                                    passwordController.text = "";
+
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Admin())); // Navigate
+                                  } else {
+                                    // Show error message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text('Incorrect password'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ));
+                },
+              ),
+              ListTile(
+                title: const Text('Report'),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ReportsPage()));
+                },
+              ),
+            ],
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.zero,
+              child: Column(children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width / 30,
+                          right: MediaQuery.of(context).size.width / 30),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.5,
+                          child: TextField(
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 28),
+                            controller: plateNumber,
+                            keyboardType: TextInputType.none,
+                            maxLength: 4,
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              errorText:
+                                  isValid ? null : 'Enter 4 digit number.',
+                              label: const Text(''),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Wrap(spacing: 5.0, runSpacing: 10.0, children: [
-                    ElevatedButton(
-                      onPressed: () => setState(() {
-                        _showSearchResults = false;
-                      }),
-                      child: Text('Cancel'),
-                      style: ElevatedButton.styleFrom(
-                          minimumSize: Size(
-                              MediaQuery.of(context).size.width / 30,
-                              MediaQuery.of(context).size.height / 10)),
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          if (plateNumber.text.length > 0) {
-                            plateNumber.text = plateNumber.text
-                                .substring(0, plateNumber.text.length - 1);
-                          } else {
-                            plateNumber.text = '';
-                          }
-                        },
+                    Wrap(spacing: 5.0, runSpacing: 10.0, children: [
+                      ElevatedButton(
+                        onPressed: () => setState(() {
+                          _showSearchResults = false;
+                        }),
+                        child: const Text('Cancel'),
                         style: ElevatedButton.styleFrom(
                             minimumSize: Size(
-                                MediaQuery.of(context).size.width / 4,
+                                MediaQuery.of(context).size.width / 30,
                                 MediaQuery.of(context).size.height / 10)),
-                        onLongPress: () {
-                          plateNumber.text = "";
-                        },
-                        child:
-                            const Text('DEL', style: TextStyle(fontSize: 18))),
-                  ]),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Visibility(
-                visible: _showSearchResults,
-                child: SingleChildScrollView(
-                  child: Container(
-                    height: 250,
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio:
-                              MediaQuery.of(context).size.height / 400),
-                      shrinkWrap: true,
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final vehicleData = _searchResults[index];
-                        final plateNumber = vehicleData['VehicleNumber'];
-                        final ownerName = vehicleData['VehicleOwnerName'];
-                        final make = vehicleData['Make'] ?? "";
-                        final phoneNumber = vehicleData['MobileNumber'] ?? "";
-                        // final address = vehicleData['Address'];
-                        // final color = vehicleData['Color'];
-                        // final driverName = vehicleData['DriverName'];
-                        // final driverPhone = vehicleData['DriverPhone'];
-                        return GridTile(
-                          footer: GridTileBar(
-                              title: Flexible(
-                            child: Text(
-                              "$make\n$ownerName\n$phoneNumber",
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          )),
-                          child: Wrap(
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: vehicleData['MarkColor'] !=
-                                            null
-                                        ? Colors.green
-                                        : Color.fromARGB(255, 206, 219, 223)),
-                                onPressed: () async {
-                                  final docId = vehicleData['docId'];
-                                  FirebaseFirestore.instance
-                                      .collection('cars')
-                                      .doc(docId)
-                                      .update({
-                                        'TimeIn': DateTime.now(),
-                                        'MarkColor': true,
-                                        'Gate': selectedGate,
-                                        'User': widget.name
-                                      })
-                                      .then((value) => setState(() {
-                                            _showSearchResults = false;
-                                          }))
-                                      .then((value) =>
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content:
-                                                  Text('TimeIn Data Added'),
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                            ),
-                                          ));
-                                },
-                                onLongPress: () async {
-                                  final docId = vehicleData[
-                                      'docId']; // Access docId from the map
-                                  FirebaseFirestore.instance
-                                      .collection('cars')
-                                      .doc(docId)
-                                      .update({
-                                        'TimeIn': FieldValue.delete(),
-                                        'MarkColor': FieldValue.delete(),
-                                        'User': FieldValue.delete(),
-                                      })
-                                      .then((value) => setState(() {
-                                            _showSearchResults = false;
-                                          }))
-                                      .then((value) =>
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                              content:
-                                                  Text('TimeIn Data Deleted'),
-                                            ),
-                                          ));
-                                },
-                                child: Text('$plateNumber'),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (plateNumber.text.length > 0) {
+                              plateNumber.text = plateNumber.text
+                                  .substring(0, plateNumber.text.length - 1);
+                            } else {
+                              plateNumber.text = '';
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              minimumSize: Size(
+                                  MediaQuery.of(context).size.width / 4,
+                                  MediaQuery.of(context).size.height / 10)),
+                          onLongPress: () {
+                            plateNumber.text = "";
+                          },
+                          child: const Text('DEL',
+                              style: TextStyle(fontSize: 18))),
+                    ]),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Visibility(
+                    visible: !_showSearchResults,
+                    child: Container(
+                      height: 250,
+                    )),
+                Visibility(
+                  visible: _showSearchResults,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      height: 250,
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio:
+                                MediaQuery.of(context).size.height / 400),
+                        shrinkWrap: true,
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final vehicleData = _searchResults[index];
+                          final plateNumber = vehicleData['VehicleNumber'];
+                          final ownerName = vehicleData['VehicleOwnerName'];
+                          final make = vehicleData['Make'] ?? "";
+                          final phoneNumber = vehicleData['MobileNumber'] ?? "";
+                          // final address = vehicleData['Address'];
+                          // final color = vehicleData['Color'];
+                          // final driverName = vehicleData['DriverName'];
+                          // final driverPhone = vehicleData['DriverPhone'];
+                          return GridTile(
+                            footer: GridTileBar(
+                                title: Flexible(
+                              child: Text(
+                                "$make\n$ownerName\n$phoneNumber",
+                                style: const TextStyle(color: Colors.black),
                               ),
-                            ],
-                          ),
-                        );
-                      },
+                            )),
+                            child: Wrap(
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          vehicleData['MarkColor'] != null
+                                              ? Colors.green
+                                              : const Color.fromARGB(
+                                                  255, 206, 219, 223)),
+                                  onPressed: () async {
+                                    final docId = vehicleData['docId'];
+                                    final carDoc = await FirebaseFirestore
+                                        .instance
+                                        .collection('cars')
+                                        .doc(docId)
+                                        .get();
+                                    if (carDoc.data()?['TimeIn'] == null) {
+                                      FirebaseFirestore.instance
+                                          .collection('cars')
+                                          .doc(docId)
+                                          .update({
+                                            'TimeIn': DateTime.now(),
+                                            'MarkColor': true,
+                                            'Gate': selectedGate,
+                                            'User': widget.name
+                                          })
+                                          .then(
+                                            (value) {
+                                              print(selectedGate);
+                                              FirebaseFirestore.instance
+                                                  .collection('gateCounts')
+                                                  .doc(selectedGate)
+                                                  .update({
+                                                "count": FieldValue.increment(1)
+                                              });
+                                            },
+                                          )
+                                          .then((value) => setState(() {
+                                                _showSearchResults = false;
+                                              }))
+                                          .then((value) =>
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content:
+                                                      Text('TimeIn Data Added'),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                ),
+                                              ));
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text('Car already entered.'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ));
+                                      _showSearchResults = false;
+                                    }
+                                  },
+                                  onLongPress: () async {
+                                    final docId = vehicleData['docId'];
+                                    FirebaseFirestore.instance
+                                        .collection('cars')
+                                        .doc(docId)
+                                        .update({
+                                          'TimeIn': FieldValue.delete(),
+                                          'MarkColor': FieldValue.delete(),
+                                          'User': FieldValue.delete(),
+                                        })
+                                        .then(
+                                          (value) => setState(() {
+                                            _showSearchResults = false;
+                                          }),
+                                        )
+                                        .then(
+                                          (value) => FirebaseFirestore.instance
+                                              .collection('gateCounts')
+                                              .doc(selectedGate)
+                                              .update({
+                                            "count": FieldValue.increment(-1)
+                                          }),
+                                        )
+                                        .then((value) =>
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                content:
+                                                    Text('TimeIn Data Deleted'),
+                                              ),
+                                            ));
+                                  },
+                                  child: Text('$plateNumber'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 10),
-              Numpad(),
-              SizedBox(height: 10),
-            ]),
+                const SizedBox(height: 10),
+                Numpad(),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('gateCounts')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final gateCountsData = snapshot.data!.docs;
+                        Map<String, int> gateCounts = {};
+                        for (var doc in gateCountsData) {
+                          gateCounts[doc.id] = doc['count'];
+                        }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text('Gate 1: ${gateCounts['Gate 1'].toString()}'),
+                            Text('Gate 2: ${gateCounts['Gate 2'].toString()}'),
+                            Text('Gate 3: ${gateCounts['Gate 3'].toString()}'),
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+                    },
+                  ),
+                ),
+              ]),
+            ),
           ),
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              final firestore = FirebaseFirestore.instance;
+              final collection = firestore.collection('cars');
+
+              try {
+                // Replace with the actual path to your JSON file on the device
+                final filePath = 'assets/data.json';
+                final String jsonString = await rootBundle.loadString(filePath);
+                final List<dynamic> jsonData = jsonDecode(jsonString);
+
+                final modifiedData = jsonData
+                    .map((map) {
+                      final vehicleNumber = map['VehicleNumber']?.toString();
+                      if (vehicleNumber != null && vehicleNumber.length >= 4) {
+                        final fourNumber =
+                            vehicleNumber.substring(vehicleNumber.length - 4);
+                        map['fourNumber'] = fourNumber;
+                      }
+                      return map;
+                    })
+                    .toList()
+                    .cast<Map<String, dynamic>>();
+
+                for (final map in modifiedData) {
+                  await collection.add(map);
+                }
+
+                print('Data uploaded successfully!');
+              } catch (error) {
+                print('Error uploading data: $error');
+              }
+            },
+            child: Icon(Icons.add)));
   }
 
   Column Numpad() {
@@ -357,15 +461,15 @@ class _HomePageState extends State<HomePage> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Spacer(),
+          const Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(),
+                shape: const RoundedRectangleBorder(),
                 minimumSize: Size(MediaQuery.of(context).size.width / 3.5,
                     MediaQuery.of(context).size.height / 13),
                 fixedSize: Size(MediaQuery.of(context).size.width / 8,
                     MediaQuery.of(context).size.height / 20)),
-            child: Text('0', style: TextStyle(fontSize: 26)),
+            child: const Text('0', style: TextStyle(fontSize: 26)),
             onPressed: () {
               plateNumber.text += '0';
               plateNumber.value = TextEditingValue(
@@ -374,7 +478,7 @@ class _HomePageState extends State<HomePage> {
                       TextPosition(offset: plateNumber.text.length)));
             },
           ),
-          Spacer(),
+          const Spacer(),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -398,13 +502,13 @@ class _HomePageState extends State<HomePage> {
               ));
               plateNumber.text = "";
             },
-            child: Text('Search',
+            child: const Text('Search',
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: Colors.black87)),
           ),
-          Spacer(),
+          const Spacer(),
         ],
       ),
     ]);
@@ -412,15 +516,15 @@ class _HomePageState extends State<HomePage> {
 
   ElevatedButton numButton({required String number}) => ElevatedButton(
         style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(),
+            shape: const RoundedRectangleBorder(),
             minimumSize: Size(MediaQuery.of(context).size.width / 3.5,
                 MediaQuery.of(context).size.height / 13)),
-        child: Text(number, style: TextStyle(fontSize: 26)),
+        child: Text(number, style: const TextStyle(fontSize: 26)),
         onPressed: () {
           if (plateNumber.text.length < 4) {
             plateNumber.text += number;
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Maximum length reached'),
               duration: Duration(milliseconds: 500),
             ));
@@ -447,67 +551,67 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (context) => SingleChildScrollView(
               child: AlertDialog(
-                  title: Text('Update Car'),
+                  title: const Text('Update Car'),
                   content: Column(
                     children: [
                       TextField(
                         controller: nameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             border: OutlineInputBorder(), labelText: 'Name'),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TextField(
                         controller: numberController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Phone Number'),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TextField(
                         controller: plateController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Vehicle Number'),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       TextField(
                           controller: addressController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Address',
                             //   errorText: 'Field cannot be empty!',
                           )),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TextField(
                           controller: makeController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Vehicle Make',
                           )),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TextField(
                           controller: colorController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Vehicle Color',
                           )),
-                      SizedBox(height: 15),
-                      Text('Driver Details'),
+                      const SizedBox(height: 15),
+                      const Text('Driver Details'),
                       TextField(
                         controller: driverNameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Driver Name',
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       TextField(
                           controller: driverPhoneController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Driver Phone Number',
                           )),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
                         // Using DropdownButtonFormField for decoration
                         value: selectedType,
@@ -553,7 +657,7 @@ class _HomePageState extends State<HomePage> {
                           );
                         }).toList(),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       ElevatedButton(
                           onPressed: () async {
                             await CheckUpdate(
@@ -570,7 +674,7 @@ class _HomePageState extends State<HomePage> {
                             );
                             Navigator.pop(context);
                           },
-                          child: Text('Submit'))
+                          child: const Text('Submit'))
                     ],
                   )),
             ));
@@ -581,16 +685,16 @@ class _HomePageState extends State<HomePage> {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Enter Password'),
+              title: const Text('Enter Password'),
               content: TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -607,26 +711,26 @@ class _HomePageState extends State<HomePage> {
                           .then((value) => showDialog(
                               context: context, // Replace with your context
                               builder: (context) => AlertDialog(
-                                    title: Text("Success"),
-                                    content:
-                                        Text("User data deleted successfully!"),
+                                    title: const Text("Success"),
+                                    content: const Text(
+                                        "User data deleted successfully!"),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: Text("OK"),
+                                        child: const Text("OK"),
                                       ),
                                     ],
                                   )))
                           .onError((error, stackTrace) => showDialog(
                                 context: context, // Replace with your context
                                 builder: (context) => AlertDialog(
-                                  title: Text("Error"),
+                                  title: const Text("Error"),
                                   content: Text(
                                       "Error deleting user data: ${error.toString()}"),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
-                                      child: Text("OK"),
+                                      child: const Text("OK"),
                                     ),
                                   ],
                                 ),
@@ -634,14 +738,14 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           behavior: SnackBarBehavior.floating,
                           content: Text('Incorrect password'),
                         ),
                       );
                     }
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             ));
@@ -661,16 +765,16 @@ class _HomePageState extends State<HomePage> {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Enter Password'),
+              title: const Text('Enter Password'),
               content: TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -699,7 +803,7 @@ class _HomePageState extends State<HomePage> {
                               }))
                           .then((value) =>
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   behavior: SnackBarBehavior.floating,
                                   content: Text('Updated Successfully'),
                                 ),
@@ -708,14 +812,14 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           behavior: SnackBarBehavior.floating,
                           content: Text('Incorrect password'),
                         ),
                       );
                     }
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             ));

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddCarPage extends StatefulWidget {
+  const AddCarPage({super.key});
+
   @override
   _AddCarPage createState() => _AddCarPage();
 }
@@ -72,7 +74,7 @@ class _AddCarPage extends State<AddCarPage> {
         await firestore.collection('cars').add(userInfo);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Car added successfully!')),
+          const SnackBar(content: const Text('Car added successfully!')),
         );
 
         Navigator.pop(context);
@@ -89,23 +91,23 @@ class _AddCarPage extends State<AddCarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Car'),
+        title: const Text('Add Car'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Vehicle Owner Name'),
+                decoration: const InputDecoration(labelText: 'Vehicle Owner Name'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a name' : null,
               ),
               TextFormField(
                 controller: plateController,
-                decoration: InputDecoration(labelText: 'Vehicle Number'),
+                decoration: const InputDecoration(labelText: 'Vehicle Number'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a plate number' : null,
               ),
@@ -119,45 +121,45 @@ class _AddCarPage extends State<AddCarPage> {
                     .toList(),
                 onChanged: (value) =>
                     setState(() => selectedType = value as String),
-                decoration: InputDecoration(labelText: 'Vehicle Type'),
+                decoration: const InputDecoration(labelText: 'Vehicle Type'),
               ),
               TextFormField(
                 controller: numberController,
-                decoration: InputDecoration(labelText: 'Mobile Number'),
+                decoration: const InputDecoration(labelText: 'Mobile Number'),
                 keyboardType: TextInputType.phone,
               ),
               TextFormField(
                 controller: fourNumberController,
-                decoration: InputDecoration(labelText: 'Last Four Number'),
+                decoration: const InputDecoration(labelText: 'Last Four Number'),
                 keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: addressController,
-                decoration: InputDecoration(labelText: 'Address (Optional)'),
+                decoration: const InputDecoration(labelText: 'Address (Optional)'),
               ),
               TextFormField(
                 controller: makeController,
-                decoration: InputDecoration(labelText: 'Make (Optional)'),
+                decoration: const InputDecoration(labelText: 'Make (Optional)'),
               ),
               TextFormField(
                 controller: colorController,
-                decoration: InputDecoration(labelText: 'Color (Optional)'),
+                decoration: const InputDecoration(labelText: 'Color (Optional)'),
               ),
               TextFormField(
                 controller: driverNameController,
                 decoration:
-                    InputDecoration(labelText: 'Driver Name (Optional)'),
+                    const InputDecoration(labelText: 'Driver Name (Optional)'),
               ),
               TextFormField(
                 controller: driverPhoneController,
                 decoration:
-                    InputDecoration(labelText: 'Driver Phone (Optional)'),
+                    const InputDecoration(labelText: 'Driver Phone (Optional)'),
                 keyboardType: TextInputType.phone,
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _addCarToFirebase,
-                child: Text('Add Car'),
+                child: const Text('Add Car'),
               ),
             ],
           ),

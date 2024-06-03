@@ -7,8 +7,8 @@ class DatabaseHelper {
   // Singleton instance
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-  static final String databaseName = "ReportsPage.db";
-  static final String tableName = 'cars';
+  static const String databaseName = "ReportsPage.db";
+  static const String tableName = 'cars';
   late final Database database;
   static bool isInitialized = false;
 
@@ -42,7 +42,7 @@ class DatabaseHelper {
 
   Future<int> insert(Map<String, dynamic> data) async {
     final db = await this.database;
-    print('Inserting data ${data}');
+    // print('Inserting data ${data}');
     final id = await db.insert(tableName, data,
         conflictAlgorithm: ConflictAlgorithm.replace);
     return id;
@@ -52,7 +52,7 @@ class DatabaseHelper {
     for (var user in cars) {
       final data = Map<String, dynamic>.from(user);
       data.removeWhere((key, value) => value == null);
-      print(data);
+      // print(data);
       await database.insert(
         'cars',
         data,
@@ -65,13 +65,13 @@ class DatabaseHelper {
     if (DatabaseHelper.isInitialized) {
       final db = await database;
       await db.delete(tableName);
-      print('table deleted');
+      // print('table deleted');
     }
   }
 
   Future<void> resetFirebaseValues() async {
     final firestore = FirebaseFirestore.instance;
-    final today = DateTime.now();
+    // final today = DateTime.now();
 
     final querySnapshot = await firestore
         .collection('cars')
@@ -94,7 +94,32 @@ class DatabaseHelper {
       });
     }
     await batch.commit();
-    print('firebase reseted');
+    // print('firebase reseted');
+  }
+
+  Future<void> resetGateCounts() async {
+    try {
+      final batch = FirebaseFirestore.instance.batch();
+
+      // Get references to the gate count documents
+      final gate1Ref =
+          FirebaseFirestore.instance.collection('gateCounts').doc('Gate 1');
+      final gate2Ref =
+          FirebaseFirestore.instance.collection('gateCounts').doc('Gate 2');
+      final gate3Ref =
+          FirebaseFirestore.instance.collection('gateCounts').doc('Gate 3');
+
+      // Set the count to 0 for each document
+      batch.update(gate1Ref, {'count': 0});
+      batch.update(gate2Ref, {'count': 0});
+      batch.update(gate3Ref, {'count': 0});
+
+      // Commit the batch write
+      await batch.commit();
+    } catch (e) {
+      // Handle errors
+      print('Error resetting gate counts: $e');
+    }
   }
 
   Future<List<Map<String, dynamic>>> searchVehicles(String number) async {
@@ -111,7 +136,7 @@ class DatabaseHelper {
         'docId': docId, // Add document ID to the map
       });
     }
-    print(vehiclesWithDocIds);
+    // print(vehiclesWithDocIds);
     return vehiclesWithDocIds;
   }
 }

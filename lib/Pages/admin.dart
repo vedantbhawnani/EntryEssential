@@ -97,6 +97,8 @@ class _AdminState extends State<Admin> {
                         .resetFirebaseValues()
                         .then((value) => DatabaseHelper.instance.resetTable())
                         .then((value) =>
+                            DatabaseHelper.instance.resetGateCounts())
+                        .then((value) =>
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text('Values resetted.'),
                               behavior: SnackBarBehavior.floating,
