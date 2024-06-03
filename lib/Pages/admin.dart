@@ -34,8 +34,8 @@ class _AdminState extends State<Admin> {
       appBar: AppBar(),
       body: Column(
         children: [
-          Spacer(),
-          Center(child: Text('Admin Access', style: TextStyle(fontSize: 25))),
+          const Spacer(),
+          const Center(child: Text('Admin Access', style: TextStyle(fontSize: 25))),
           Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -46,34 +46,34 @@ class _AdminState extends State<Admin> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AddCarPage()));
+                              builder: (context) => const AddCarPage()));
                     },
-                    child: Text('Add Car')),
+                    child: const Text('Add Car')),
                 ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UpdateCarPage()));
+                              builder: (context) => const UpdateCarPage()));
                     },
-                    child: Text('Update Car')),
+                    child: const Text('Update Car')),
                 ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DeleteCarPage()));
+                              builder: (context) => const DeleteCarPage()));
                     },
-                    child: Text('Delete Car')),
+                    child: const Text('Delete Car')),
                 // Spacer(),
               ]),
           ElevatedButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AddUserPage()));
+                    MaterialPageRoute(builder: (context) => const AddUserPage()));
               },
-              child: Text('Add user')),
-          Spacer(
+              child: const Text('Add user')),
+          const Spacer(
             flex: 2,
           ),
         ],
@@ -83,13 +83,13 @@ class _AdminState extends State<Admin> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Confirm Reset'),
-              content: Text(
+              title: const Text('Confirm Reset'),
+              content: const Text(
                   'Are you sure you want to reset Firebase values and the local database table? This action cannot be undone.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: (() async {
@@ -99,19 +99,19 @@ class _AdminState extends State<Admin> {
                         .then((value) =>
                             DatabaseHelper.instance.resetGateCounts())
                         .then((value) =>
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               content: Text('Values resetted.'),
                               behavior: SnackBarBehavior.floating,
                             )))
                         .then((value) => Navigator.pop(context));
                   }),
-                  child: Text('Reset'),
+                  child: const Text('Reset'),
                 ),
               ],
             ),
           );
         },
-        child: Icon(CupertinoIcons.refresh_thick),
+        child: const Icon(CupertinoIcons.refresh_thick),
       ),
     );
   }

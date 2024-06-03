@@ -11,7 +11,7 @@ import 'admin.dart';
 
 class HomePage extends StatefulWidget {
   final String name;
-  HomePage({super.key, required this.name});
+  const HomePage({super.key, required this.name});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
               icon: Row(
                 children: [
                   Text(
-                    "$selectedGate",
+                    selectedGate,
                     style: const TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                       ))
                   .toList(),
             ),
-            const Spacer(flex: 4), // Add Spacer after actions
+            const Spacer(flex: 4),
           ],
         ),
         drawer: Drawer(
@@ -126,8 +126,10 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: const Text('Report'),
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ReportsPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ReportsPage()));
                 },
               ),
             ],
@@ -173,15 +175,15 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () => setState(() {
                           _showSearchResults = false;
                         }),
-                        child: const Text('Cancel'),
                         style: ElevatedButton.styleFrom(
                             minimumSize: Size(
                                 MediaQuery.of(context).size.width / 30,
                                 MediaQuery.of(context).size.height / 10)),
+                        child: const Text('Cancel'),
                       ),
                       ElevatedButton(
                           onPressed: () {
-                            if (plateNumber.text.length > 0) {
+                            if (plateNumber.text.isNotEmpty) {
                               plateNumber.text = plateNumber.text
                                   .substring(0, plateNumber.text.length - 1);
                             } else {
@@ -204,13 +206,13 @@ class _HomePageState extends State<HomePage> {
                 Visibility(
                     visible: !_showSearchResults,
                     child: Container(
-                      height: 250,
+                      height: MediaQuery.of(context).size.height / 3.5,
                     )),
                 Visibility(
                   visible: _showSearchResults,
                   child: SingleChildScrollView(
-                    child: Container(
-                      height: 250,
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height / 3.5,
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -224,112 +226,120 @@ class _HomePageState extends State<HomePage> {
                           final ownerName = vehicleData['VehicleOwnerName'];
                           final make = vehicleData['Make'] ?? "";
                           final phoneNumber = vehicleData['MobileNumber'] ?? "";
-                          // final address = vehicleData['Address'];
-                          // final color = vehicleData['Color'];
-                          // final driverName = vehicleData['DriverName'];
-                          // final driverPhone = vehicleData['DriverPhone'];
-                          return GridTile(
-                            footer: GridTileBar(
-                                title: Flexible(
-                              child: Text(
-                                "$make\n$ownerName\n$phoneNumber",
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            )),
-                            child: Wrap(
+                          return Card(
+
+                            child: Column(
                               children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          vehicleData['MarkColor'] != null
-                                              ? Colors.green
-                                              : const Color.fromARGB(
-                                                  255, 206, 219, 223)),
-                                  onPressed: () async {
-                                    final docId = vehicleData['docId'];
-                                    final carDoc = await FirebaseFirestore
-                                        .instance
-                                        .collection('cars')
-                                        .doc(docId)
-                                        .get();
-                                    if (carDoc.data()?['TimeIn'] == null) {
-                                      FirebaseFirestore.instance
-                                          .collection('cars')
-                                          .doc(docId)
-                                          .update({
-                                            'TimeIn': DateTime.now(),
-                                            'MarkColor': true,
-                                            'Gate': selectedGate,
-                                            'User': widget.name
-                                          })
-                                          .then(
-                                            (value) {
-                                              print(selectedGate);
-                                              FirebaseFirestore.instance
+                                Wrap(
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              vehicleData['MarkColor'] != null
+                                                  ? Colors.green
+                                                  : const Color.fromARGB(
+                                                      255, 206, 219, 223)),
+                                      onPressed: () async {
+                                        final docId = vehicleData['docId'];
+                                        final carDoc = await FirebaseFirestore
+                                            .instance
+                                            .collection('cars')
+                                            .doc(docId)
+                                            .get();
+                                        if (carDoc.data()?['TimeIn'] == null) {
+                                          FirebaseFirestore.instance
+                                              .collection('cars')
+                                              .doc(docId)
+                                              .update({
+                                                'TimeIn': DateTime.now(),
+                                                'MarkColor': true,
+                                                'Gate': selectedGate,
+                                                'User': widget.name
+                                              })
+                                              .then(
+                                                (value) {
+                                                  print(selectedGate);
+                                                  FirebaseFirestore.instance
+                                                      .collection('gateCounts')
+                                                      .doc(selectedGate)
+                                                      .update({
+                                                    "count":
+                                                        FieldValue.increment(1)
+                                                  });
+                                                },
+                                              )
+                                              .then((value) => setState(() {
+                                                    _showSearchResults = false;
+                                                  }))
+                                              .then((value) =>
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          'TimeIn Data Added'),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                    ),
+                                                  ));
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                            content:
+                                                Text('Car already entered.'),
+                                            behavior: SnackBarBehavior.floating,
+                                          ));
+                                          _showSearchResults = false;
+                                        }
+                                      },
+                                      onLongPress: () async {
+                                        final docId = vehicleData['docId'];
+                                        FirebaseFirestore.instance
+                                            .collection('cars')
+                                            .doc(docId)
+                                            .update({
+                                              'TimeIn': FieldValue.delete(),
+                                              'MarkColor': FieldValue.delete(),
+                                              'User': FieldValue.delete(),
+                                            })
+                                            .then(
+                                              (value) => setState(() {
+                                                _showSearchResults = false;
+                                              }),
+                                            )
+                                            .then(
+                                              (value) => FirebaseFirestore
+                                                  .instance
                                                   .collection('gateCounts')
                                                   .doc(selectedGate)
                                                   .update({
-                                                "count": FieldValue.increment(1)
-                                              });
-                                            },
-                                          )
-                                          .then((value) => setState(() {
-                                                _showSearchResults = false;
-                                              }))
-                                          .then((value) =>
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content:
-                                                      Text('TimeIn Data Added'),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                ),
-                                              ));
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text('Car already entered.'),
-                                        behavior: SnackBarBehavior.floating,
-                                      ));
-                                      _showSearchResults = false;
-                                    }
-                                  },
-                                  onLongPress: () async {
-                                    final docId = vehicleData['docId'];
-                                    FirebaseFirestore.instance
-                                        .collection('cars')
-                                        .doc(docId)
-                                        .update({
-                                          'TimeIn': FieldValue.delete(),
-                                          'MarkColor': FieldValue.delete(),
-                                          'User': FieldValue.delete(),
-                                        })
-                                        .then(
-                                          (value) => setState(() {
-                                            _showSearchResults = false;
-                                          }),
-                                        )
-                                        .then(
-                                          (value) => FirebaseFirestore.instance
-                                              .collection('gateCounts')
-                                              .doc(selectedGate)
-                                              .update({
-                                            "count": FieldValue.increment(-1)
-                                          }),
-                                        )
-                                        .then((value) =>
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                behavior:
-                                                    SnackBarBehavior.floating,
-                                                content:
-                                                    Text('TimeIn Data Deleted'),
-                                              ),
-                                            ));
-                                  },
-                                  child: Text('$plateNumber'),
+                                                "count":
+                                                    FieldValue.increment(-1)
+                                              }),
+                                            )
+                                            .then((value) =>
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: Text(
+                                                        'TimeIn Data Deleted'),
+                                                  ),
+                                                ));
+                                      },
+                                      child: Text('$plateNumber'),
+                                    ),
+                                  ],
+                                ),
+                                if (make.isNotEmpty)
+                                Text(
+                                  "$ownerName\n$phoneNumber\n$make",
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                if (!make.isNotEmpty)
+                                Text(
+                                  "$ownerName\n$phoneNumber",
+                                  style: const TextStyle(color: Colors.black),
                                 ),
                               ],
                             ),
@@ -339,9 +349,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: MediaQuery.of(context).size.height / 50),
                 Numpad(),
-                const SizedBox(height: 10),
+                SizedBox(height: MediaQuery.of(context).size.height / 50),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: StreamBuilder<QuerySnapshot>(
@@ -375,14 +385,14 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+        
         floatingActionButton: FloatingActionButton(
             onPressed: () async {
               final firestore = FirebaseFirestore.instance;
               final collection = firestore.collection('cars');
 
               try {
-                // Replace with the actual path to your JSON file on the device
-                final filePath = 'assets/data.json';
+                const filePath = 'assets/combined_new.json';
                 final String jsonString = await rootBundle.loadString(filePath);
                 final List<dynamic> jsonData = jsonDecode(jsonString);
 
@@ -408,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                 print('Error uploading data: $error');
               }
             },
-            child: Icon(Icons.add)));
+            child: const Icon(Icons.add)));
   }
 
   Column Numpad() {

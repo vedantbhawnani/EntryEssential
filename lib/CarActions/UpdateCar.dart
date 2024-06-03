@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class UpdateCarPage extends StatefulWidget {
+  const UpdateCarPage({super.key});
+
   @override
   _UpdateCarPageState createState() => _UpdateCarPageState();
 }

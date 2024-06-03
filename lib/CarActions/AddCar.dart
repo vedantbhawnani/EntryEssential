@@ -74,7 +74,7 @@ class _AddCarPage extends State<AddCarPage> {
         await firestore.collection('cars').add(userInfo);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: const Text('Car added successfully!')),
+          const SnackBar(content: Text('Car added successfully!')),
         );
 
         Navigator.pop(context);

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class DeleteCarPage extends StatefulWidget {
+  const DeleteCarPage({super.key});
+
   @override
   _DeleteCarPageState createState() => _DeleteCarPageState();
 }
@@ -49,7 +51,7 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
     final carNumber = carNumberController.text;
     if (carNumber.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Not found')));
+          .showSnackBar(const SnackBar(content: Text('Not found')));
       return; // Handle empty car number
     }
 
@@ -60,7 +62,7 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
           .get();
       if (snapshot.docs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Car not found with that number!')),
+          const SnackBar(content: Text('Car not found with that number!')),
         );
         return;
       }
@@ -79,7 +81,7 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
     } catch (error) {
       print('Error finding car: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error finding car. Please try again.')),
+        const SnackBar(content: Text('Error finding car. Please try again.')),
       );
     }
   }
@@ -97,7 +99,7 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
     } catch (error) {
       print('Error deleting car: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting car. Please try again.')),
+        const SnackBar(content: Text('Error deleting car. Please try again.')),
       );
     } finally {
       carRef = "";
@@ -110,30 +112,30 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Delete Car'),
+        title: const Text('Delete Car'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
               // Car number search field
               TextFormField(
                 controller: carNumberController,
-                decoration: InputDecoration(labelText: 'Car Number'),
+                decoration: const InputDecoration(labelText: 'Car Number'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a car number' : null,
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: _findCarByNumber,
-                child: Text('Find Car'),
+                child: const Text('Find Car'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Visibility(
                 visible: display,
                 child: Container(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200, // Light grey background
                     borderRadius:
@@ -147,30 +149,30 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
                         mainAxisAlignment: MainAxisAlignment
                             .spaceBetween, // Space labels evenly
                         children: [
-                          Text(
+                          const Text(
                             'Owner Name:',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(nameController.text),
                         ],
                       ),
-                      SizedBox(height: 10.0), // Add some vertical spacing
+                      const SizedBox(height: 10.0), // Add some vertical spacing
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Vehicle Number:',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(plateController.text),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       makeController.text != ""
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
+                                const Text(
                                   'Vehicle Make:',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -182,7 +184,7 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
+                                const Text(
                                   'Vehicle Color:',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
@@ -197,11 +199,11 @@ class _DeleteCarPageState extends State<DeleteCarPage> {
               ElevatedButton(
                 onPressed: carRef != ""
                     ? _deleteCar
-                    : null, // Disable if carRef is null
-                child: Text('Delete Car'),
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red, // Use red color for confirmation
-                ),
+                ), // Disable if carRef is null
+                child: const Text('Delete Car'),
               ),
             ],
           ),

@@ -29,7 +29,7 @@ class _OCRState extends State<OCR> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('OCR'),
+          title: const Text('OCR'),
         ),
         body: Center(
           child: Column(
@@ -67,9 +67,9 @@ class _OCRState extends State<OCR> {
 
 class Result extends StatelessWidget {
   const Result({
-    Key? key,
+    super.key,
     required this.text,
-  }) : super(key: key);
+  });
 
   final String text;
 
@@ -86,6 +86,6 @@ class Result extends StatelessWidget {
             Navigator.pop(context, "");
           }
         },
-        child: text.isEmpty ? Text('Return') : Text('Read Data ${text}'));
+        child: text.isEmpty ? const Text('Return') : Text('Read Data $text'));
   }
 }

@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UpdateCarPage extends StatefulWidget {
+  const UpdateCarPage({super.key});
+
   @override
   _UpdateCarPageState createState() => _UpdateCarPageState();
 }
@@ -52,7 +54,7 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
     final carNumber = carNumberController.text;
     if (carNumber.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Not found')));
+          .showSnackBar(const SnackBar(content: Text('Not found')));
       return;
     }
 
@@ -63,7 +65,7 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
           .get();
       if (snapshot.docs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Car not found with that number!')),
+          const SnackBar(content: Text('Car not found with that number!')),
         );
         return;
       }
@@ -107,18 +109,18 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
       try {
         await carRef!.update(carUpdates);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Car information updated successfully!')),
+          const SnackBar(content: Text('Car information updated successfully!')),
         );
         Navigator.pop(context);
       } catch (error) {
         print('Error updating car: $error');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating car. Please try again.')),
+          const SnackBar(content: Text('Error updating car. Please try again.')),
         );
       }
     } else if (carRef == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please find a car to update first!')),
+        const SnackBar(content: Text('Please find a car to update first!')),
       );
     }
   }
@@ -127,10 +129,10 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Car'),
+        title: const Text('Update Car'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           // Wrap in SingleChildScrollView to handle potential overflow
           child: Column(
@@ -138,16 +140,16 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
               // Car number search field
               TextFormField(
                 controller: carNumberController,
-                decoration: InputDecoration(labelText: 'Car Number'),
+                decoration: const InputDecoration(labelText: 'Car Number'),
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter a car number' : null,
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: _findCarByNumber,
-                child: Text('Find Car'),
+                child: const Text('Find Car'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Form(
                 key: _formKey,
                 child: carRef != null
@@ -155,7 +157,7 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
                         children: [
                           TextFormField(
                             controller: nameController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 labelText: 'Vehicle Owner Name'),
                             validator: (value) =>
                                 value!.isEmpty ? 'Please enter a name' : null,
@@ -163,7 +165,7 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
                           TextFormField(
                             controller: plateController,
                             decoration:
-                                InputDecoration(labelText: 'Vehicle Number'),
+                                const InputDecoration(labelText: 'Vehicle Number'),
                             validator: (value) => value!.isEmpty
                                 ? 'Please enter a plate number'
                                 : null,
@@ -171,7 +173,7 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
                           TextFormField(
                             controller: numberController,
                             decoration:
-                                InputDecoration(labelText: 'Mobile Number'),
+                                const InputDecoration(labelText: 'Mobile Number'),
                             keyboardType: TextInputType.phone,
                             validator: (value) => value!.isEmpty
                                 ? 'Please enter a mobile number'
@@ -190,44 +192,44 @@ class _UpdateCarPageState extends State<UpdateCarPage> {
                           ),
                           TextFormField(
                             controller: addressController,
-                            decoration: InputDecoration(labelText: 'Address'),
+                            decoration: const InputDecoration(labelText: 'Address'),
                             validator: (value) => value!.isEmpty
                                 ? 'Please enter an address'
                                 : null,
                           ),
                           TextFormField(
                             controller: makeController,
-                            decoration: InputDecoration(labelText: 'Make'),
+                            decoration: const InputDecoration(labelText: 'Make'),
                             validator: (value) => value!.isEmpty
                                 ? 'Please enter the car make'
                                 : null,
                           ),
                           TextFormField(
                             controller: colorController,
-                            decoration: InputDecoration(labelText: 'Color'),
+                            decoration: const InputDecoration(labelText: 'Color'),
                             validator: (value) => value!.isEmpty
                                 ? 'Please enter the car color'
                                 : null,
                           ),
                           TextFormField(
                             controller: driverNameController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 labelText: 'Driver Name (Optional)'),
                           ),
                           TextFormField(
                             controller: driverPhoneController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 labelText: 'Driver Phone (Optional)'),
                             keyboardType: TextInputType.phone,
                           ),
-                          SizedBox(height: 16.0),
+                          const SizedBox(height: 16.0),
                           ElevatedButton(
                             onPressed: _updateCarInfo,
-                            child: Text('Update Car'),
+                            child: const Text('Update Car'),
                           ),
                         ],
                       )
-                    : SizedBox(), // Show nothing if carRef is null
+                    : const SizedBox(), // Show nothing if carRef is null
               ),
             ],
           ),

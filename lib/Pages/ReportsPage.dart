@@ -9,6 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:rssb/Helper/Helper.dart';
 
 class ReportsPage extends StatefulWidget {
+  const ReportsPage({super.key});
+
   @override
   _ReportsPageState createState() => _ReportsPageState();
 }
@@ -71,7 +73,7 @@ class _ReportsPageState extends State<ReportsPage> {
     final directory = await getExternalStorageDirectory();
     final filename =
         '${time.year}-${time.month}-${time.day}-${time.hour}-${time.day}-${time.minute}-${time.second}';
-    final path = join(directory!.path, 'Report-${filename}.csv');
+    final path = join(directory!.path, 'Report-$filename.csv');
     final file = File(path);
 
     await Permission.storage.request();
@@ -91,7 +93,7 @@ class _ReportsPageState extends State<ReportsPage> {
     csvData.writeln();
     final results = await DatabaseHelper.instance.database.query('cars');
     for (var row in results) {
-      print('Row ${row}');
+      print('Row $row');
       csvData.write([
         row['VehicleNumber'] ?? '',
         row['VehicleOwnerName'] ?? '',
@@ -117,18 +119,18 @@ class _ReportsPageState extends State<ReportsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Report'),
+        title: const Text('Report'),
         actions: [
           IconButton(
-            icon: Icon(Icons.download),
+            icon: const Icon(Icons.download),
             onPressed: () => downloadFromDatabase().then((value) =>
                 ScaffoldMessenger.of(context).showMaterialBanner(MaterialBanner(
-                  content: Text('File stored in ${value}'),
+                  content: Text('File stored in $value'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => ScaffoldMessenger.of(context)
                           .removeCurrentMaterialBanner(),
-                      child: Text('DISMISS'),
+                      child: const Text('DISMISS'),
                     ),
                   ],
                 ))),
@@ -136,7 +138,7 @@ class _ReportsPageState extends State<ReportsPage> {
         ],
       ),
       body: _cars.isEmpty
-          ? Center(child: Text('No entries yet.'))
+          ? const Center(child: Text('No entries yet.'))
           : ListView.builder(
               itemCount: _cars.length,
               itemBuilder: (context, index) {
@@ -145,37 +147,37 @@ class _ReportsPageState extends State<ReportsPage> {
                 return ListTile(
                   title: Center(
                     child: Text(user['VehicleOwnerName'] ?? 'Unknown',
-                        style: TextStyle(fontSize: 24)),
+                        style: const TextStyle(fontSize: 24)),
                   ),
                   subtitle: Column(
                     children: [
                       Text('Vehicle Number: ${user['VehicleNumber']}',
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                       Text('TimeIn: ${user['TimeIn'].toString()}',
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                       Text('Gate Number: ${user['Gate']}',
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                       if (user['Address'] != null)
                         Text('Address: ${user['Address']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['Make'] != null)
                         Text('Vehicle Make: ${user['Make']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['Color'] != null)
                         Text('Vehicle Color: ${user['Color']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['DriverName'] != null)
                         Text('DriverName: ${user['DriverName']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['DriverPhone'] != null)
                         Text('DriverPhone: ${user['DriverPhone']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['TimeOut'] != null)
                         Text('TimeOut: ${user['TimeOut']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                       if (user['User'] != null)
                         Text('User: ${user['User']}',
-                            style: TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 );

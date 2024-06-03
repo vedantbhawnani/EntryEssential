@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:rssb/Pages/HomePage.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -27,15 +29,15 @@ class _LoginPageState extends State<LoginPage> {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No user found for that email.')));
+            const SnackBar(content: Text('No user found for that email.')));
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that email.');
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Wrong password provided.')));
+            .showSnackBar(const SnackBar(content: Text('Wrong password provided.')));
       } else {
         print(e.code);
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login failed. Please try again.')));
+            const SnackBar(content: Text('Login failed. Please try again.')));
       }
     }
   }
@@ -44,37 +46,37 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your email' : null,
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your password' : null,
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _signInWithEmailAndPassword();
                   }
                 },
-                child: Text('Login'),
+                child: const Text('Login'),
               ),
             ],
           ),

@@ -41,7 +41,7 @@ class DatabaseHelper {
   }
 
   Future<int> insert(Map<String, dynamic> data) async {
-    final db = await this.database;
+    final db = database;
     // print('Inserting data ${data}');
     final id = await db.insert(tableName, data,
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -63,7 +63,7 @@ class DatabaseHelper {
 
   Future<void> resetTable() async {
     if (DatabaseHelper.isInitialized) {
-      final db = await database;
+      final db = database;
       await db.delete(tableName);
       // print('table deleted');
     }
