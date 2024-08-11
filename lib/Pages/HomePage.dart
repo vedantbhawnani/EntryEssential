@@ -42,383 +42,345 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          actions: [
-            const Spacer(), // Add Spacer before actions
-            PopupMenuButton<String>(
-              icon: Row(
-                children: [
-                  Text(
-                    selectedGate,
-                    style: const TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        actions: [
+          const Spacer(), // Add Spacer before actions
+          PopupMenuButton<String>(
+            icon: Row(
+              children: [
+                Text(
+                  selectedGate,
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const Icon(
-                    Icons.arrow_drop_down,
-                    size: 40,
-                  ), // Add dropdown icon
-                ],
-              ),
-              onSelected: (value) => setState(() => selectedGate = value),
-              itemBuilder: (context) => gateNumbers
-                  .map((gate) => PopupMenuItem<String>(
-                        value: gate,
-                        child: Text(gate),
-                      ))
-                  .toList(),
+                ),
+                const Icon(
+                  Icons.arrow_drop_down,
+                  size: 40,
+                ), // Add dropdown icon
+              ],
             ),
-            const Spacer(flex: 4),
+            onSelected: (value) => setState(() => selectedGate = value),
+            itemBuilder: (context) => gateNumbers
+                .map((gate) => PopupMenuItem<String>(
+                      value: gate,
+                      child: Text(gate),
+                    ))
+                .toList(),
+          ),
+          const Spacer(flex: 4),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: const Text('Admin Access'),
+              onTap: () async {
+                await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: const Text('Enter Password'),
+                          content: TextField(
+                            controller: passwordController,
+                            obscureText: true,
+                            decoration:
+                                const InputDecoration(labelText: 'Password'),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                final enteredPassword = passwordController.text;
+                                if (enteredPassword == correctPassword) {
+                                  passwordController.text = "";
+
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Admin())); // Navigate
+                                } else {
+                                  // Show error message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text('Incorrect password'),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ));
+              },
+            ),
+            ListTile(
+              title: const Text('Report'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ReportsPage()));
+              },
+            ),
           ],
         ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                title: const Text('Admin Access'),
-                onTap: () async {
-                  await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title: const Text('Enter Password'),
-                            content: TextField(
-                              controller: passwordController,
-                              obscureText: true,
-                              decoration:
-                                  const InputDecoration(labelText: 'Password'),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  final enteredPassword =
-                                      passwordController.text;
-                                  if (enteredPassword == correctPassword) {
-                                    passwordController.text = "";
-
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Admin())); // Navigate
-                                  } else {
-                                    // Show error message
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        behavior: SnackBarBehavior.floating,
-                                        content: Text('Incorrect password'),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ));
-                },
-              ),
-              ListTile(
-                title: const Text('Report'),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ReportsPage()));
-                },
-              ),
-            ],
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.zero,
-              child: Column(children: [
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width / 30,
-                          right: MediaQuery.of(context).size.width / 30),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width / 2.5,
-                          child: TextField(
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 28),
-                            controller: plateNumber,
-                            keyboardType: TextInputType.none,
-                            maxLength: 4,
-                            textAlign: TextAlign.center,
-                            decoration: InputDecoration(
-                              errorText:
-                                  isValid ? null : 'Enter 4 digit number.',
-                              label: const Text(''),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+      ),
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.zero,
+            child: Column(children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width / 30,
+                        right: MediaQuery.of(context).size.width / 30),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: TextField(
+                          style: TextStyle(
+                              fontSize:
+                                  MediaQuery.of(context).size.height / 28),
+                          controller: plateNumber,
+                          keyboardType: TextInputType.none,
+                          maxLength: 4,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            errorText: isValid ? null : 'Enter 4 digit number.',
+                            label: const Text(''),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Wrap(spacing: 5.0, runSpacing: 10.0, children: [
-                      ElevatedButton(
-                        onPressed: () => setState(() {
-                          _showSearchResults = false;
-                        }),
+                  ),
+                  Wrap(spacing: 5.0, runSpacing: 10.0, children: [
+                    ElevatedButton(
+                      onPressed: () => setState(() {
+                        _showSearchResults = false;
+                      }),
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: Size(
+                              MediaQuery.of(context).size.width / 30,
+                              MediaQuery.of(context).size.height / 10)),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (plateNumber.text.isNotEmpty) {
+                            plateNumber.text = plateNumber.text
+                                .substring(0, plateNumber.text.length - 1);
+                          } else {
+                            plateNumber.text = '';
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                             minimumSize: Size(
-                                MediaQuery.of(context).size.width / 30,
+                                MediaQuery.of(context).size.width / 4,
                                 MediaQuery.of(context).size.height / 10)),
-                        child: const Text('Cancel'),
-                      ),
-                      ElevatedButton(
-                          onPressed: () {
-                            if (plateNumber.text.isNotEmpty) {
-                              plateNumber.text = plateNumber.text
-                                  .substring(0, plateNumber.text.length - 1);
-                            } else {
-                              plateNumber.text = '';
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              minimumSize: Size(
-                                  MediaQuery.of(context).size.width / 4,
-                                  MediaQuery.of(context).size.height / 10)),
-                          onLongPress: () {
-                            plateNumber.text = "";
-                          },
-                          child: const Text('DEL',
-                              style: TextStyle(fontSize: 18))),
-                    ]),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Visibility(
-                    visible: !_showSearchResults,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height / 3.5,
-                    )),
-                Visibility(
-                  visible: _showSearchResults,
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height / 3.5,
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio:
-                                MediaQuery.of(context).size.height / 400),
-                        shrinkWrap: true,
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final vehicleData = _searchResults[index];
-                          final plateNumber = vehicleData['VehicleNumber'];
-                          final ownerName = vehicleData['VehicleOwnerName'];
-                          final make = vehicleData['Make'] ?? "";
-                          final phoneNumber = vehicleData['MobileNumber'] ?? "";
-                          return Card(
-
-                            child: Column(
-                              children: [
-                                Wrap(
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              vehicleData['MarkColor'] != null
-                                                  ? Colors.green
-                                                  : const Color.fromARGB(
-                                                      255, 206, 219, 223)),
-                                      onPressed: () async {
-                                        final docId = vehicleData['docId'];
-                                        final carDoc = await FirebaseFirestore
-                                            .instance
-                                            .collection('cars')
-                                            .doc(docId)
-                                            .get();
-                                        if (carDoc.data()?['TimeIn'] == null) {
-                                          FirebaseFirestore.instance
-                                              .collection('cars')
-                                              .doc(docId)
-                                              .update({
-                                                'TimeIn': DateTime.now(),
-                                                'MarkColor': true,
-                                                'Gate': selectedGate,
-                                                'User': widget.name
-                                              })
-                                              .then(
-                                                (value) {
-                                                  print(selectedGate);
-                                                  FirebaseFirestore.instance
-                                                      .collection('gateCounts')
-                                                      .doc(selectedGate)
-                                                      .update({
-                                                    "count":
-                                                        FieldValue.increment(1)
-                                                  });
-                                                },
-                                              )
-                                              .then((value) => setState(() {
-                                                    _showSearchResults = false;
-                                                  }))
-                                              .then((value) =>
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                          'TimeIn Data Added'),
-                                                      behavior: SnackBarBehavior
-                                                          .floating,
-                                                    ),
-                                                  ));
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                            content:
-                                                Text('Car already entered.'),
-                                            behavior: SnackBarBehavior.floating,
-                                          ));
-                                          _showSearchResults = false;
-                                        }
-                                      },
-                                      onLongPress: () async {
-                                        final docId = vehicleData['docId'];
+                        onLongPress: () {
+                          plateNumber.text = "";
+                        },
+                        child:
+                            const Text('DEL', style: TextStyle(fontSize: 18))),
+                  ]),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Visibility(
+                  visible: !_showSearchResults,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height / 3.5,
+                  )),
+              Visibility(
+                visible: _showSearchResults,
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height / 3.5,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio:
+                              MediaQuery.of(context).size.height / 400),
+                      shrinkWrap: true,
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final vehicleData = _searchResults[index];
+                        final plateNumber = vehicleData['VehicleNumber'];
+                        final ownerName = vehicleData['VehicleOwnerName'];
+                        final make = vehicleData['Make'] ?? "";
+                        final phoneNumber = vehicleData['MobileNumber'] ?? "";
+                        return Card(
+                          child: Column(
+                            children: [
+                              Wrap(
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            vehicleData['MarkColor'] != null
+                                                ? Colors.green
+                                                : const Color.fromARGB(
+                                                    255, 206, 219, 223)),
+                                    onPressed: () async {
+                                      final docId = vehicleData['docId'];
+                                      final carDoc = await FirebaseFirestore
+                                          .instance
+                                          .collection('cars')
+                                          .doc(docId)
+                                          .get();
+                                      if (carDoc.data()?['TimeIn'] == null) {
                                         FirebaseFirestore.instance
                                             .collection('cars')
                                             .doc(docId)
                                             .update({
-                                              'TimeIn': FieldValue.delete(),
-                                              'MarkColor': FieldValue.delete(),
-                                              'User': FieldValue.delete(),
+                                              'TimeIn': DateTime.now(),
+                                              'MarkColor': true,
+                                              'Gate': selectedGate,
+                                              'User': widget.name
                                             })
                                             .then(
-                                              (value) => setState(() {
-                                                _showSearchResults = false;
-                                              }),
+                                              (value) {
+                                                print(selectedGate);
+                                                FirebaseFirestore.instance
+                                                    .collection('gateCounts')
+                                                    .doc(selectedGate)
+                                                    .update({
+                                                  "count":
+                                                      FieldValue.increment(1)
+                                                });
+                                              },
                                             )
-                                            .then(
-                                              (value) => FirebaseFirestore
-                                                  .instance
-                                                  .collection('gateCounts')
-                                                  .doc(selectedGate)
-                                                  .update({
-                                                "count":
-                                                    FieldValue.increment(-1)
-                                              }),
-                                            )
+                                            .then((value) => setState(() {
+                                                  _showSearchResults = false;
+                                                }))
                                             .then((value) =>
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(
+                                                    content: Text(
+                                                        'TimeIn Data Added'),
                                                     behavior: SnackBarBehavior
                                                         .floating,
-                                                    content: Text(
-                                                        'TimeIn Data Deleted'),
                                                   ),
                                                 ));
-                                      },
-                                      child: Text('$plateNumber'),
-                                    ),
-                                  ],
-                                ),
-                                if (make.isNotEmpty)
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content: Text('Car already entered.'),
+                                          behavior: SnackBarBehavior.floating,
+                                        ));
+                                        _showSearchResults = false;
+                                      }
+                                    },
+                                    onLongPress: () async {
+                                      final docId = vehicleData['docId'];
+                                      FirebaseFirestore.instance
+                                          .collection('cars')
+                                          .doc(docId)
+                                          .update({
+                                            'TimeIn': FieldValue.delete(),
+                                            'MarkColor': FieldValue.delete(),
+                                            'User': FieldValue.delete(),
+                                          })
+                                          .then(
+                                            (value) => setState(() {
+                                              _showSearchResults = false;
+                                            }),
+                                          )
+                                          .then(
+                                            (value) => FirebaseFirestore
+                                                .instance
+                                                .collection('gateCounts')
+                                                .doc(selectedGate)
+                                                .update({
+                                              "count": FieldValue.increment(-1)
+                                            }),
+                                          )
+                                          .then((value) =>
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  content: Text(
+                                                      'TimeIn Data Deleted'),
+                                                ),
+                                              ));
+                                    },
+                                    child: Text('$plateNumber'),
+                                  ),
+                                ],
+                              ),
+                              if (make.isNotEmpty)
                                 Text(
                                   "$ownerName\n$phoneNumber\n$make",
                                   style: const TextStyle(color: Colors.black),
                                 ),
-                                if (!make.isNotEmpty)
+                              if (!make.isNotEmpty)
                                 Text(
                                   "$ownerName\n$phoneNumber",
                                   style: const TextStyle(color: Colors.black),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height / 50),
-                Numpad(),
-                SizedBox(height: MediaQuery.of(context).size.height / 50),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('gateCounts')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final gateCountsData = snapshot.data!.docs;
-                        Map<String, int> gateCounts = {};
-                        for (var doc in gateCountsData) {
-                          gateCounts[doc.id] = doc['count'];
-                        }
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text('Gate 1: ${gateCounts['Gate 1'].toString()}'),
-                            Text('Gate 2: ${gateCounts['Gate 2'].toString()}'),
-                            Text('Gate 3: ${gateCounts['Gate 3'].toString()}'),
-                          ],
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return const CircularProgressIndicator();
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 50),
+              Numpad(),
+              SizedBox(height: MediaQuery.of(context).size.height / 50),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('gateCounts')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final gateCountsData = snapshot.data!.docs;
+                      Map<String, int> gateCounts = {};
+                      for (var doc in gateCountsData) {
+                        gateCounts[doc.id] = doc['count'];
                       }
-                    },
-                  ),
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text('Gate 1: ${gateCounts['Gate 1'].toString()}'),
+                          Text('Gate 2: ${gateCounts['Gate 2'].toString()}'),
+                          Text('Gate 3: ${gateCounts['Gate 3'].toString()}'),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
-              ]),
-            ),
+              ),
+            ]),
           ),
         ),
-        
-        floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              final firestore = FirebaseFirestore.instance;
-              final collection = firestore.collection('cars');
-
-              try {
-                const filePath = 'assets/combined_new.json';
-                final String jsonString = await rootBundle.loadString(filePath);
-                final List<dynamic> jsonData = jsonDecode(jsonString);
-
-                final modifiedData = jsonData
-                    .map((map) {
-                      final vehicleNumber = map['VehicleNumber']?.toString();
-                      if (vehicleNumber != null && vehicleNumber.length >= 4) {
-                        final fourNumber =
-                            vehicleNumber.substring(vehicleNumber.length - 4);
-                        map['fourNumber'] = fourNumber;
-                      }
-                      return map;
-                    })
-                    .toList()
-                    .cast<Map<String, dynamic>>();
-
-                for (final map in modifiedData) {
-                  await collection.add(map);
-                }
-
-                print('Data uploaded successfully!');
-              } catch (error) {
-                print('Error uploading data: $error');
-              }
-            },
-            child: const Icon(Icons.add)));
+      ),
+    );
   }
 
   Column Numpad() {
